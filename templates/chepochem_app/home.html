@@ -1,0 +1,219 @@
+{% extends 'chepochem_app/base.html' %}
+{% load static %}
+
+{% block title %}ЧёПочём - Главная{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Боковая панель с категориями -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Категории</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="{% url 'home' %}" class="text-decoration-none {% if not selected_category %}fw-bold{% endif %}">
+                            <i class="fas fa-th-large me-2"></i>Все категории
+                        </a>
+                    </li>
+                    {% for category in categories %}
+                        <li class="mb-2">
+                            <a href="{% url 'home' %}?category={{ category.id }}" 
+                               class="text-decoration-none {% if selected_category == category.id|stringformat:'s' %}fw-bold{% endif %}">
+                                <i class="fas fa-{{ category.icon }} me-2"></i>{{ category.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="col-md-9">
+        <!-- Фильтры и сортировка -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h4 class="mb-0 text-dark">
+                            {% if selected_category %}
+                                {% for category in categories %}
+                                    {% if selected_category == category.id|stringformat:'s' %}
+                                        {{ category.name }}
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                Все объявления
+                            {% endif %}
+                        </h4>
+                        <small class="text-muted">{{ page_obj.paginator.count }} объявлений</small>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-end">
+                            <select class="form-select" onchange="window.location.href='?sort=' + this.value + '{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}'">
+                                <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Сначала новые</option>
+                                <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Цена: по возрастанию</option>
+                                <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Цена: по убыванию</option>
+                                <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Популярные</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сетка объявлений -->
+        {% if page_obj %}
+            <div class="row">
+                {% for listing in page_obj %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100 listing-card">
+                            <!-- Изображение -->
+                            <div class="position-relative">
+                                {% if listing.listingimage_set.first %}
+                                    <img src="{{ listing.listingimage_set.first.image.url }}" 
+                                         class="card-img-top listing-image" 
+                                         alt="{{ listing.title }}">
+                                {% else %}
+                                    <div class="card-img-top listing-image bg-light d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-image fa-3x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Статус -->
+                                {% if listing.is_urgent %}
+                                    <span class="badge bg-danger position-absolute top-0 start-0 m-2">Срочно</span>
+                                {% endif %}
+                                
+                                <!-- Избранное -->
+                                {% if user.is_authenticated %}
+                                    <button class="btn btn-sm btn-outline-light position-absolute top-0 end-0 m-2 favorite-btn" 
+                                            data-listing-id="{{ listing.id }}">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="card-body d-flex flex-column">
+                                <!-- Заголовок и цена -->
+                                <h6 class="card-title">
+                                    <a href="{% url 'listing_detail' listing.id %}" class="text-decoration-none text-dark">
+                                        {{ listing.title|truncatechars:50 }}
+                                    </a>
+                                </h6>
+                                
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="h5 text-primary mb-0">
+                                            {{ listing.price|floatformat:0 }} {{ listing.currency }}
+                                        </span>
+                                        <small class="text-muted">
+                                            <i class="fas fa-eye me-1"></i>{{ listing.views_count }}
+                                        </small>
+                                    </div>
+                                    
+                                    <!-- Местоположение и дата -->
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-map-marker-alt me-1"></i>{{ listing.location }}
+                                        </small>
+                                        <br>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>{{ listing.created_at|date:"d.m.Y" }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Пагинация -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Навигация по страницам">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Первая</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Предыдущая</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Следующая</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Последняя</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4 class="text-dark">Объявления не найдены</h4>
+                <p class="text-muted">Попробуйте изменить параметры поиска или выбрать другую категорию</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Добавление в избранное
+document.addEventListener('DOMContentLoaded', function() {
+    const favoriteButtons = document.querySelectorAll('.favorite-btn');
+    
+    favoriteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const listingId = this.dataset.listingId;
+            const icon = this.querySelector('i');
+            
+            fetch(`/toggle-favorite/${listingId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.is_favorited) {
+                    icon.classList.add('fas');
+                    icon.classList.remove('far');
+                    this.classList.add('btn-danger');
+                    this.classList.remove('btn-outline-light');
+                } else {
+                    icon.classList.add('far');
+                    icon.classList.remove('fas');
+                    this.classList.add('btn-outline-light');
+                    this.classList.remove('btn-danger');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
+</script>
+{% endblock %}

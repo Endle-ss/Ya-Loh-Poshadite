@@ -1,0 +1,251 @@
+{% extends 'chepochem_app/base.html' %}
+{% load static %}
+
+{% block title %}{{ listing.title }} - ЧёПочём{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <!-- Заголовок и основная информация -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h1 class="h3 mb-0">{{ listing.title }}</h1>
+                    {% if user == listing.user %}
+                        <div class="btn-group">
+                            <a href="{% url 'edit_listing' listing.id %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-edit me-1"></i>Редактировать
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2 class="text-primary mb-3">{{ listing.price|floatformat:0 }} {{ listing.currency }}</h2>
+                        
+                        <div class="mb-3">
+                            <strong>Состояние:</strong> {{ listing.get_condition_display }}<br>
+                            <strong>Местоположение:</strong> {{ listing.location }}<br>
+                            <strong>Дата публикации:</strong> {{ listing.created_at|date:"d.m.Y H:i" }}
+                        </div>
+                        
+                        {% if listing.is_negotiable %}
+                            <span class="badge bg-success">Торг возможен</span>
+                        {% endif %}
+                        {% if listing.is_urgent %}
+                            <span class="badge bg-danger">Срочно</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-end">
+                            <div class="mb-2">
+                                <i class="fas fa-eye me-1"></i>{{ listing.views_count }} просмотров
+                            </div>
+                            <div class="mb-2">
+                                <i class="fas fa-heart me-1"></i>{{ listing.favorites_count }} в избранном
+                            </div>
+                            {% if user.is_authenticated and user != listing.user %}
+                                <div class="mt-3">
+                                    <button class="btn btn-outline-danger me-2" id="favorite-btn" data-listing-id="{{ listing.id }}">
+                                        <i class="fas fa-heart me-1"></i>
+                                        {% if is_favorited %}В избранном{% else %}Добавить в избранное{% endif %}
+                                    </button>
+                                    <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#reportModal">
+                                        <i class="fas fa-flag me-1"></i>Пожаловаться
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Изображения -->
+        {% if images %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Фотографии</h5>
+                    <div class="row">
+                        {% for image in images %}
+                            <div class="col-md-4 mb-3">
+                                <img src="{{ image.image.url }}" class="img-fluid rounded listing-detail-image" 
+                                     alt="{{ image.alt_text|default:listing.title }}" 
+                                     data-bs-toggle="modal" data-bs-target="#imageModal{{ image.id }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Описание -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Описание</h5>
+                <div class="listing-description">
+                    {{ listing.description|linebreaks }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Информация о продавце -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Продавец</h5>
+                <div class="d-flex align-items-center mb-3">
+                    {% if listing.user.avatar %}
+                        <img src="{{ listing.user.avatar.url }}" class="rounded-circle me-3" width="50" height="50" alt="Аватар">
+                    {% else %}
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" width="50" height="50">
+                            {{ listing.user.first_name|first|default:listing.user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h6 class="mb-0">
+                            <a href="{% url 'user_profile' listing.user.username %}" class="text-decoration-none">
+                                {{ listing.user.get_full_name|default:listing.user.username }}
+                            </a>
+                        </h6>
+                        <small class="text-muted">На сайте с {{ listing.user.date_joined|date:"Y" }}</small>
+                    </div>
+                </div>
+                
+                {% if listing.user.userreputation %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Репутация:</span>
+                            <span class="badge bg-{% if listing.user.userreputation.reputation_level == 'master' %}success{% elif listing.user.userreputation.reputation_level == 'expert' %}info{% elif listing.user.userreputation.reputation_level == 'trusted' %}primary{% else %}secondary{% endif %}">
+                                {{ listing.user.userreputation.get_reputation_level_display }}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Отзывы:</span>
+                            <span>{{ listing.user.userreputation.positive_reviews }}+ / {{ listing.user.userreputation.negative_reviews }}-</span>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                {% if user.is_authenticated and user != listing.user %}
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'create_review' listing.user.username %}" class="btn btn-outline-primary">
+                            <i class="fas fa-star me-1"></i>Оставить отзыв
+                        </a>
+                        <a href="{% url 'user_profile' listing.user.username %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-user me-1"></i>Посмотреть профиль
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Похожие объявления -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Похожие объявления</h5>
+                <p class="text-muted">Похожих объявлений не найдено</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для жалобы -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Пожаловаться на объявление</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'create_report' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="reported_listing" value="{{ listing.id }}">
+                    <div class="mb-3">
+                        <label class="form-label">Тип жалобы</label>
+                        <select class="form-select" name="report_type" required>
+                            <option value="">Выберите тип жалобы</option>
+                            <option value="spam">Спам</option>
+                            <option value="inappropriate">Неподходящий контент</option>
+                            <option value="fraud">Мошенничество</option>
+                            <option value="duplicate">Дубликат</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <textarea class="form-control" name="description" rows="3" required 
+                                  placeholder="Опишите причину жалобы"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-warning">Отправить жалобу</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальные окна для изображений -->
+{% for image in images %}
+    <div class="modal fade" id="imageModal{{ image.id }}" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ image.alt_text|default:listing.title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="{{ image.image.url }}" class="img-fluid" alt="{{ image.alt_text|default:listing.title }}">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Добавление в избранное
+document.addEventListener('DOMContentLoaded', function() {
+    const favoriteBtn = document.getElementById('favorite-btn');
+    
+    if (favoriteBtn) {
+        favoriteBtn.addEventListener('click', function() {
+            const listingId = this.dataset.listingId;
+            const icon = this.querySelector('i');
+            const text = this.querySelector('span') || this;
+            
+            fetch(`/toggle-favorite/${listingId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.is_favorited) {
+                    icon.classList.add('fas');
+                    icon.classList.remove('far');
+                    this.classList.add('btn-danger');
+                    this.classList.remove('btn-outline-danger');
+                    text.textContent = 'В избранном';
+                } else {
+                    icon.classList.add('far');
+                    icon.classList.remove('fas');
+                    this.classList.add('btn-outline-danger');
+                    this.classList.remove('btn-danger');
+                    text.textContent = 'Добавить в избранное';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    }
+});
+</script>
+{% endblock %}

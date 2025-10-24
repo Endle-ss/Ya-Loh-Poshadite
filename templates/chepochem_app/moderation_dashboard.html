@@ -1,0 +1,245 @@
+{% extends 'chepochem_app/base.html' %}
+{% load static %}
+
+{% block title %}Панель модерации - ЧёПочём{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-shield-alt me-2"></i>Панель модерации
+            </h2>
+            <div class="badge bg-primary fs-6">
+                {{ user.role.get_name_display }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Статистика -->
+    <div class="col-md-3 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                <h4 class="text-warning">{{ pending_listings.count }}</h4>
+                <p class="mb-0">На модерации</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-flag fa-2x text-danger mb-2"></i>
+                <h4 class="text-danger">{{ pending_reports.count }}</h4>
+                <p class="mb-0">Жалоб</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                <h4 class="text-success">0</h4>
+                <p class="mb-0">Одобрено сегодня</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-times-circle fa-2x text-danger mb-2"></i>
+                <h4 class="text-danger">0</h4>
+                <p class="mb-0">Отклонено сегодня</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Объявления на модерации -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2"></i>Объявления на модерации
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if pending_listings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Объявление</th>
+                                    <th>Пользователь</th>
+                                    <th>Цена</th>
+                                    <th>Дата</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for listing in pending_listings %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if listing.listingimage_set.first %}
+                                                    <img src="{{ listing.listingimage_set.first.image.url }}" 
+                                                         class="rounded me-3" width="50" height="50" alt="{{ listing.title }}">
+                                                {% else %}
+                                                    <div class="rounded bg-light d-flex align-items-center justify-content-center me-3" width="50" height="50">
+                                                        <i class="fas fa-image text-muted"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <h6 class="mb-0">{{ listing.title|truncatechars:30 }}</h6>
+                                                    <small class="text-muted">{{ listing.category.name }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'user_profile' listing.user.username %}" class="text-decoration-none">
+                                                {{ listing.user.username }}
+                                            </a>
+                                        </td>
+                                        <td>{{ listing.price|floatformat:0 }} {{ listing.currency }}</td>
+                                        <td>{{ listing.created_at|date:"d.m.Y H:i" }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'listing_detail' listing.id %}" class="btn btn-outline-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'moderate_listing' listing.id %}" class="btn btn-outline-primary">
+                                                    <i class="fas fa-gavel"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h5 class="text-muted">Нет объявлений на модерации</h5>
+                        <p class="text-muted">Все объявления обработаны!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Жалобы -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-flag me-2"></i>Жалобы
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if pending_reports %}
+                    {% for report in pending_reports|slice:":5" %}
+                        <div class="border-bottom pb-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="mb-0">{{ report.get_report_type_display }}</h6>
+                                <small class="text-muted">{{ report.created_at|date:"d.m" }}</small>
+                            </div>
+                            <p class="text-muted small mb-2">{{ report.description|truncatechars:100 }}</p>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">
+                                    От: {{ report.reporter.username }}
+                                </small>
+                                <a href="#" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    {% if pending_reports.count > 5 %}
+                        <div class="text-center">
+                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                Показать все ({{ pending_reports.count }})
+                            </a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-2x text-success mb-3"></i>
+                        <h6 class="text-muted">Нет жалоб</h6>
+                        <p class="text-muted small">Все жалобы обработаны!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Быстрые действия -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>Быстрые действия
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'home' %}?status=pending" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-clock me-2"></i>Все на модерации
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="#" class="btn btn-outline-danger w-100">
+                            <i class="fas fa-flag me-2"></i>Все жалобы
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="#" class="btn btn-outline-info w-100">
+                            <i class="fas fa-chart-bar me-2"></i>Статистика
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="#" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-cog me-2"></i>Настройки
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .btn-group-sm > .btn, .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
