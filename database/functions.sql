@@ -1,6 +1,3 @@
--- Функции базы данных для ЧёПочём
--- Неделя 4-5: Расширенная серверная логика
-
 -- 1. Функция обновления репутации пользователя
 CREATE OR REPLACE FUNCTION update_user_reputation(p_user_id INTEGER)
 RETURNS VOID AS $$
@@ -12,7 +9,6 @@ DECLARE
     total_score INTEGER;
     reputation_level VARCHAR(20);
 BEGIN
-    -- Подсчет отзывов
     SELECT 
         COUNT(*),
         COUNT(CASE WHEN is_positive = TRUE THEN 1 END),
@@ -23,7 +19,6 @@ BEGIN
     FROM reviews 
     WHERE reviewed_user_id = p_user_id;
     
-    -- Определение уровня репутации
     IF total_reviews = 0 THEN
         reputation_level := 'newbie';
     ELSIF positive_count >= total_reviews * 0.8 THEN
@@ -34,7 +29,6 @@ BEGIN
         reputation_level := 'trusted';
     END IF;
     
-    -- Обновление или создание записи репутации
     INSERT INTO user_reputation (
         user_id, total_score, positive_reviews, negative_reviews, 
         neutral_reviews, reputation_level, created_at, updated_at
@@ -67,15 +61,15 @@ BEGIN
     SELECT 
         COALESCE(COUNT(l.id), 0)::INTEGER as listings_count,
         COALESCE(COUNT(CASE WHEN l.status = 'sold' THEN 1 END), 0)::INTEGER as sold_count,
-        0::INTEGER as purchased_count, -- Пока не реализовано
+        0::INTEGER as purchased_count,
         COALESCE(SUM(CASE WHEN l.status = 'sold' THEN l.price ELSE 0 END), 0) as total_earnings,
-        0::DECIMAL(12,2) as total_spent, -- Пока не реализовано
+        0::DECIMAL(12,2) as total_spent,
         CASE 
             WHEN COUNT(l.id) > 0 THEN 
                 (COUNT(CASE WHEN l.status = 'sold' THEN 1 END)::DECIMAL / COUNT(l.id) * 100)
             ELSE 0 
         END as response_rate,
-        0::INTEGER as average_response_time -- Пока не реализовано
+        0::INTEGER as average_response_time
     FROM listings l
     WHERE l.user_id = p_user_id;
 END;
@@ -152,7 +146,6 @@ DECLARE
     user_role VARCHAR(50);
     is_owner BOOLEAN := FALSE;
 BEGIN
-    -- Получение роли пользователя
     SELECT r.name INTO user_role
     FROM users u
     JOIN roles r ON u.role_id = r.id
@@ -162,17 +155,14 @@ BEGIN
         RETURN FALSE;
     END IF;
     
-    -- Проверка прав администратора
     IF user_role = 'admin' THEN
         RETURN TRUE;
     END IF;
     
-    -- Проверка прав модератора
     IF user_role = 'moderator' AND p_permission IN ('moderate_listings', 'view_reports', 'ban_users') THEN
         RETURN TRUE;
     END IF;
     
-    -- Проверка прав владельца
     IF p_entity_type = 'listing' AND p_entity_id IS NOT NULL THEN
         SELECT EXISTS(
             SELECT 1 FROM listings WHERE id = p_entity_id AND user_id = p_user_id
@@ -181,7 +171,6 @@ BEGIN
         is_owner := (p_user_id = p_entity_id);
     END IF;
     
-    -- Проверка конкретных разрешений
     CASE p_permission
         WHEN 'create_listing' THEN
             RETURN user_role IN ('user', 'moderator', 'admin');
@@ -254,8 +243,6 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION hash_password(p_password TEXT)
 RETURNS TEXT AS $$
 BEGIN
-    -- Используем встроенную функцию PostgreSQL для хеширования
-    -- В реальном проекте лучше использовать bcrypt или Argon2
     RETURN crypt(p_password, gen_salt('bf', 12));
 END;
 $$ LANGUAGE plpgsql;
@@ -267,3 +254,6 @@ BEGIN
     RETURN p_hash = crypt(p_password, p_hash);
 END;
 $$ LANGUAGE plpgsql;
+
+
+

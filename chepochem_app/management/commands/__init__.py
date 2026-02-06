@@ -84,3 +84,6 @@ class Command(BaseCommand):
             self.stdout.write('  Создан администратор: admin / admin123')
         else:
             self.stdout.write('  Администратор уже существует')
+
+
+

@@ -1,6 +1,3 @@
--- Триггеры для ЧёПочём
--- Неделя 4-5: Расширенная серверная логика
-
 -- 1. Триггер для автоматического обновления updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -10,7 +7,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Применение триггера к таблицам
 CREATE TRIGGER update_users_updated_at 
     BEFORE UPDATE ON users 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -96,8 +92,6 @@ CREATE TRIGGER update_favorites_count_trigger
 CREATE OR REPLACE FUNCTION update_views_count()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Обновляем счетчик просмотров при каждом обращении к объявлению
-    -- Это будет вызываться из приложения
     UPDATE listings 
     SET views_count = views_count + 1
     WHERE id = NEW.id;
@@ -113,7 +107,6 @@ DECLARE
     old_data JSONB;
     new_data JSONB;
 BEGIN
-    -- Определение типа операции
     IF TG_OP = 'INSERT' THEN
         operation_type := 'INSERT';
         new_data := to_jsonb(NEW);
@@ -128,7 +121,6 @@ BEGIN
         new_data := NULL;
     END IF;
     
-    -- Логирование в таблицу аудита
     INSERT INTO audit_log (
         table_name, operation, old_data, new_data, 
         user_id, created_at
@@ -141,7 +133,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Применение триггера аудита к критическим таблицам
 CREATE TRIGGER audit_users_trigger
     AFTER INSERT OR UPDATE OR DELETE ON users
     FOR EACH ROW EXECUTE FUNCTION log_critical_changes();
@@ -172,7 +163,6 @@ BEGIN
         FROM listings l WHERE l.id = NEW.listing_id;
     END IF;
     
-    -- Уведомление при отклонении объявления
     IF TG_TABLE_NAME = 'listing_moderation' AND NEW.action = 'reject' THEN
         INSERT INTO notifications (user_id, type, title, content, related_entity_type, related_entity_id, created_at)
         SELECT 
@@ -186,7 +176,6 @@ BEGIN
         FROM listings l WHERE l.id = NEW.listing_id;
     END IF;
     
-    -- Уведомление при новом отзыве
     IF TG_TABLE_NAME = 'reviews' AND TG_OP = 'INSERT' THEN
         INSERT INTO notifications (user_id, type, title, content, related_entity_type, related_entity_id, created_at)
         VALUES (
@@ -218,14 +207,12 @@ RETURNS TRIGGER AS $$
 DECLARE
     target_user_id INTEGER;
 BEGIN
-    -- Определение пользователя для обновления статистики
     IF TG_TABLE_NAME = 'listings' THEN
         target_user_id := COALESCE(NEW.user_id, OLD.user_id);
     ELSIF TG_TABLE_NAME = 'reviews' THEN
         target_user_id := COALESCE(NEW.reviewed_user_id, OLD.reviewed_user_id);
     END IF;
     
-    -- Обновление статистики
     UPDATE user_statistics 
     SET 
         listings_count = (
@@ -251,27 +238,22 @@ CREATE TRIGGER update_statistics_on_listing_trigger
 CREATE OR REPLACE FUNCTION validate_listing_data()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Проверка цены
     IF NEW.price <= 0 THEN
         RAISE EXCEPTION 'Цена должна быть больше нуля';
     END IF;
     
-    -- Проверка заголовка
     IF NEW.title IS NULL OR LENGTH(TRIM(NEW.title)) = 0 THEN
         RAISE EXCEPTION 'Заголовок не может быть пустым';
     END IF;
     
-    -- Проверка описания
     IF NEW.description IS NULL OR LENGTH(TRIM(NEW.description)) = 0 THEN
         RAISE EXCEPTION 'Описание не может быть пустым';
     END IF;
     
-    -- Проверка существования пользователя
     IF NOT EXISTS (SELECT 1 FROM users WHERE id = NEW.user_id AND is_active = TRUE) THEN
         RAISE EXCEPTION 'Пользователь не найден или неактивен';
     END IF;
     
-    -- Проверка существования категории
     IF NOT EXISTS (SELECT 1 FROM categories WHERE id = NEW.category_id AND is_active = TRUE) THEN
         RAISE EXCEPTION 'Категория не найдена или неактивна';
     END IF;
@@ -288,7 +270,6 @@ CREATE TRIGGER validate_listing_data_trigger
 CREATE OR REPLACE FUNCTION expire_old_listings()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Помечаем как истекшие объявления старше 30 дней
     UPDATE listings 
     SET status = 'expired'
     WHERE status = 'active' 
@@ -305,8 +286,3 @@ BEGIN
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
-
--- Этот триггер будет вызываться периодически через cron или из приложения
--- CREATE TRIGGER expire_old_listings_trigger
---     AFTER INSERT ON listings
---     FOR EACH STATEMENT EXECUTE FUNCTION expire_old_listings();

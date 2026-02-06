@@ -4,13 +4,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import AuthenticationForm
 from .models import (
-    User, Category, Listing, ListingImage, Review, UserFavorite, 
+    User, Role, Category, Listing, ListingImage, Review, UserFavorite, 
     Report, ListingModeration, Notification, UserReputation
 )
 from .forms import (
@@ -158,12 +159,21 @@ def home(request):
     
     categories = Category.objects.filter(is_active=True, parent=None)
     
+    # Получаем список ID товаров, которые уже в избранном у текущего пользователя
+    favorited_listing_ids = set()
+    if request.user.is_authenticated:
+        favorited_listing_ids = set(
+            UserFavorite.objects.filter(user=request.user)
+            .values_list('listing_id', flat=True)
+        )
+    
     context = {
         'page_obj': page_obj,
         'categories': categories,
         'selected_category': category_id,
         'search_query': search_query,
         'sort_by': sort_by,
+        'favorited_listing_ids': favorited_listing_ids,
     }
     return render(request, 'chepochem_app/home.html', context)
 
@@ -188,13 +198,52 @@ def listing_detail(request, listing_id):
             listing=listing
         ).exists()
     
+    # Флаг: может ли текущий пользователь модерировать/удалять это объявление
+    can_moderate = False
+    if request.user.is_authenticated:
+        user_role = DjangoRBACManager.get_user_role(request.user)
+        # Модераторы и админы могут удалять любые объявления
+        if user_role in ['moderator', 'admin']:
+            can_moderate = True
+
     context = {
         'listing': listing,
         'images': images,
         'reviews': reviews,
         'is_favorited': is_favorited,
+        'can_moderate': can_moderate,
     }
     return render(request, 'chepochem_app/listing_detail.html', context)
+
+
+@login_required
+def delete_listing(request, listing_id):
+    """Удаление объявления.
+
+    - Владелец может удалять своё объявление (delete_own_listing).
+    - Модератор/админ может удалять любое объявление.
+    """
+    listing = get_object_or_404(Listing, id=listing_id)
+
+    user_role = DjangoRBACManager.get_user_role(request.user)
+
+    is_owner = listing.user_id == request.user.id
+    is_moderator_or_admin = user_role in ['moderator', 'admin']
+
+    if not (is_owner or is_moderator_or_admin):
+        return HttpResponseForbidden("Недостаточно прав для удаления объявления")
+
+    if request.method == 'POST':
+        title = listing.title
+        listing.delete()
+        messages.success(request, f'Объявление "{title}" было удалено.')
+        # Возвращаем на панель модерации, если модератор, иначе в профиль пользователя
+        if is_moderator_or_admin:
+            return redirect('moderation_dashboard')
+        return redirect('user_profile', username=request.user.username)
+
+    # Если кто-то открыл URL GET‑ом — просто редиректим без удаления
+    return redirect('listing_detail', listing_id=listing_id)
 
 
 @login_required
@@ -207,16 +256,20 @@ def create_listing(request):
         
         if form.is_valid() and formset.is_valid():
             # Валидация данных на сервере
+            # Правильная обработка чекбоксов: если не отмечен, то False (для is_urgent) или True (для is_negotiable по умолчанию)
+            is_negotiable = form.cleaned_data.get('is_negotiable', True)  # По умолчанию True в модели
+            is_urgent = form.cleaned_data.get('is_urgent', False)  # По умолчанию False в модели
+            
             listing_data = {
                 'title': form.cleaned_data['title'],
                 'description': form.cleaned_data['description'],
                 'price': form.cleaned_data['price'],
                 'category_id': form.cleaned_data['category'].id,
+                'currency': form.cleaned_data.get('currency', 'RUB'),
+                'condition': form.cleaned_data.get('condition', 'used'),
                 'location': form.cleaned_data['location'],
-                'latitude': form.cleaned_data.get('latitude'),
-                'longitude': form.cleaned_data.get('longitude'),
-                'is_negotiable': form.cleaned_data.get('is_negotiable', True),
-                'is_urgent': form.cleaned_data.get('is_urgent', False)
+                'is_negotiable': is_negotiable,
+                'is_urgent': is_urgent
             }
             
             validation_errors = DataValidator.validate_listing_data(listing_data)
@@ -227,12 +280,12 @@ def create_listing(request):
                     'form': form, 'formset': formset
                 })
             
-            # Подготовка данных изображений
+            # Подготовка данных изображений - передаем сам файл
             images_data = []
             for image_form in formset:
                 if image_form.cleaned_data and image_form.cleaned_data.get('image'):
                     images_data.append({
-                        'image_url': image_form.cleaned_data['image'].url,
+                        'image': image_form.cleaned_data['image'],  # Передаем сам файл
                         'alt_text': image_form.cleaned_data.get('alt_text', ''),
                         'sort_order': image_form.cleaned_data.get('sort_order', 0),
                         'is_primary': image_form.cleaned_data.get('is_primary', False)
@@ -250,7 +303,23 @@ def create_listing(request):
             except ValidationError as e:
                 messages.error(request, str(e))
             except Exception as e:
-                messages.error(request, 'Произошла ошибка при создании объявления')
+                import logging
+                import traceback
+                logger = logging.getLogger(__name__)
+                logger.error(f"Ошибка при создании объявления: {str(e)}\n{traceback.format_exc()}")
+                messages.error(request, f'Произошла ошибка при создании объявления: {str(e)}')
+        else:
+            # Если форма невалидна, показываем ошибки
+            if not form.is_valid():
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f'{field}: {error}')
+            if not formset.is_valid():
+                for form in formset:
+                    if form.errors:
+                        for field, errors in form.errors.items():
+                            for error in errors:
+                                messages.error(request, f'Изображение {field}: {error}')
     else:
         form = ListingForm()
         formset = ListingImageFormSet()
@@ -300,19 +369,45 @@ def user_profile(request, username):
     reputation = getattr(user, 'userreputation', None)
     statistics = getattr(user, 'userstatistics', None)
     
-    # Объявления пользователя
-    listings = Listing.objects.filter(user=user, status='active').order_by('-created_at')
+    # Все объявления пользователя с разными статусами
+    all_listings = Listing.objects.filter(user=user).order_by('-created_at')
+    
+    # Группировка по статусам
+    listings_by_status = {
+        'pending': all_listings.filter(status='pending'),
+        'active': all_listings.filter(status='active'),
+        'rejected': all_listings.filter(status='rejected'),
+        'draft': all_listings.filter(status='draft'),
+        'sold': all_listings.filter(status='sold'),
+        'paused': all_listings.filter(status='paused'),
+    }
+    
+    # Статистика по статусам
+    status_stats = {
+        'pending': listings_by_status['pending'].count(),
+        'active': listings_by_status['active'].count(),
+        'rejected': listings_by_status['rejected'].count(),
+        'draft': listings_by_status['draft'].count(),
+        'sold': listings_by_status['sold'].count(),
+        'paused': listings_by_status['paused'].count(),
+    }
     
     # Отзывы о пользователе
     reviews = Review.objects.filter(reviewed_user=user).order_by('-created_at')
+    
+    # Определяем, является ли это профилем текущего пользователя
+    is_own_profile = request.user == user
     
     context = {
         'profile_user': user,
         'profile': profile,
         'reputation': reputation,
         'statistics': statistics,
-        'listings': listings,
+        'all_listings': all_listings,
+        'listings_by_status': listings_by_status,
+        'status_stats': status_stats,
         'reviews': reviews,
+        'is_own_profile': is_own_profile,
     }
     return render(request, 'chepochem_app/user_profile.html', context)
 
@@ -341,32 +436,45 @@ def edit_profile(request):
 @require_POST
 def toggle_favorite(request, listing_id):
     """Добавление/удаление из избранного"""
-    listing = get_object_or_404(Listing, id=listing_id)
-    favorite, created = UserFavorite.objects.get_or_create(
-        user=request.user,
-        listing=listing
-    )
-    
-    if not created:
-        favorite.delete()
-        listing.favorites_count -= 1
-        is_favorited = False
-    else:
-        listing.favorites_count += 1
-        is_favorited = True
-    
-    listing.save()
-    
-    return JsonResponse({
-        'is_favorited': is_favorited,
-        'favorites_count': listing.favorites_count
-    })
+    try:
+        listing = get_object_or_404(Listing, id=listing_id)
+        favorite, created = UserFavorite.objects.get_or_create(
+            user=request.user,
+            listing=listing
+        )
+        
+        if not created:
+            favorite.delete()
+            is_favorited = False
+        else:
+            is_favorited = True
+        
+        # Обновляем счетчик из БД (триггер может обновить автоматически, но перезагружаем для надежности)
+        listing.refresh_from_db()
+        
+        return JsonResponse({
+            'is_favorited': is_favorited,
+            'favorites_count': listing.favorites_count,
+            'success': True
+        })
+    except Exception as e:
+        import logging
+        logger = logging.getLogger('chepochem_app.errors')
+        logger.error(f'Error in toggle_favorite: {str(e)}')
+        return JsonResponse({
+            'error': str(e),
+            'success': False
+        }, status=500)
 
 
 @login_required
 def favorites(request):
     """Страница избранных объявлений"""
-    favorites = UserFavorite.objects.filter(user=request.user).select_related('listing')
+    favorites = UserFavorite.objects.filter(
+        user=request.user,
+        listing__isnull=False  # Исключаем удаленные объявления
+    ).select_related('listing', 'listing__user', 'listing__category').order_by('-created_at')
+    
     paginator = Paginator(favorites, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -434,15 +542,49 @@ def create_report(request):
 def moderation_dashboard(request):
     """Панель модератора"""
     
-    # Объявления на модерации
+    # Получаем фильтр по статусу из GET параметров
+    status_filter = request.GET.get('status', 'pending')
+    
+    # Все объявления с фильтрацией
+    all_listings = Listing.objects.all()
+    if status_filter and status_filter != 'all':
+        all_listings = all_listings.filter(status=status_filter)
+    
+    # Объявления на модерации (для статистики)
     pending_listings = Listing.objects.filter(status='pending').order_by('created_at')
+    
+    # Статистика по статусам
+    listings_stats = {
+        'all': Listing.objects.count(),
+        'pending': Listing.objects.filter(status='pending').count(),
+        'active': Listing.objects.filter(status='active').count(),
+        'rejected': Listing.objects.filter(status='rejected').count(),
+        'draft': Listing.objects.filter(status='draft').count(),
+        'sold': Listing.objects.filter(status='sold').count(),
+    }
     
     # Жалобы
     pending_reports = Report.objects.filter(status='pending').order_by('created_at')
     
+    # Статистика модерации за сегодня
+    today = timezone.now().date()
+    approved_today = ListingModeration.objects.filter(
+        action='approve',
+        created_at__date=today
+    ).count()
+    rejected_today = ListingModeration.objects.filter(
+        action='reject',
+        created_at__date=today
+    ).count()
+    
     context = {
         'pending_listings': pending_listings,
+        'all_listings': all_listings.order_by('-created_at'),
+        'listings_stats': listings_stats,
+        'status_filter': status_filter,
         'pending_reports': pending_reports,
+        'approved_today': approved_today,
+        'rejected_today': rejected_today,
     }
     return render(request, 'chepochem_app/moderation_dashboard.html', context)
 

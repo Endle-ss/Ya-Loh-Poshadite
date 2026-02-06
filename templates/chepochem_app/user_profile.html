@@ -1,0 +1,354 @@
+{% extends 'chepochem_app/base.html' %}
+{% load static %}
+
+{% block title %}Профиль {{ profile_user.username }} - ЧёПочём{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Информация о пользователе -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                {% if profile_user.avatar %}
+                    <img src="{{ profile_user.avatar.url }}" class="rounded-circle mb-3" width="120" height="120" alt="Аватар">
+                {% else %}
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px; font-size: 3rem;">
+                        {{ profile_user.first_name|first|default:profile_user.username|first|upper }}
+                    </div>
+                {% endif %}
+                
+                <h4 class="mb-1">{{ profile_user.get_full_name|default:profile_user.username }}</h4>
+                <p class="text-muted mb-3">@{{ profile_user.username }}</p>
+                
+                {% if reputation %}
+                    <div class="mb-3">
+                        <span class="badge bg-{% if reputation.reputation_level == 'master' %}success{% elif reputation.reputation_level == 'expert' %}info{% elif reputation.reputation_level == 'trusted' %}primary{% else %}secondary{% endif %} fs-6">
+                            {{ reputation.get_reputation_level_display }}
+                        </span>
+                    </div>
+                    
+                    <div class="row text-center mb-3">
+                        <div class="col-4">
+                            <div class="text-success fw-bold">{{ reputation.positive_reviews }}+</div>
+                            <small class="text-muted">Положительных</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-danger fw-bold">{{ reputation.negative_reviews }}-</div>
+                            <small class="text-muted">Отрицательных</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-bold">{{ reputation.total_score }}</div>
+                            <small class="text-muted">Баллов</small>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                {% if is_own_profile %}
+                    <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i>Редактировать профиль
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Дополнительная информация -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">Информация</h6>
+            </div>
+            <div class="card-body">
+                {% if profile_user.email %}
+                    <div class="mb-2">
+                        <i class="fas fa-envelope text-muted me-2"></i>
+                        <small>{{ profile_user.email }}</small>
+                    </div>
+                {% endif %}
+                
+                {% if profile_user.phone %}
+                    <div class="mb-2">
+                        <i class="fas fa-phone text-muted me-2"></i>
+                        <small>{{ profile_user.phone }}</small>
+                    </div>
+                {% endif %}
+                
+                {% if profile %}
+                    {% if profile.location %}
+                        <div class="mb-2">
+                            <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                            <small>{{ profile.location }}</small>
+                        </div>
+                    {% endif %}
+                {% endif %}
+                
+                <div class="mb-2">
+                    <i class="fas fa-calendar text-muted me-2"></i>
+                    <small>На сайте с {{ profile_user.date_joined|date:"d.m.Y" }}</small>
+                </div>
+                
+                {% if profile_user.is_verified %}
+                    <div class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <small class="text-success">Подтвержден</small>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if statistics %}
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Статистика</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>Объявлений:</strong> {{ statistics.listings_count }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Продано:</strong> {{ statistics.sold_count }}
+                    </div>
+                    {% if statistics.total_earnings > 0 %}
+                        <div class="mb-2">
+                            <strong>Заработано:</strong> {{ statistics.total_earnings|floatformat:0 }} RUB
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Основной контент -->
+    <div class="col-md-8">
+        <!-- Статистика объявлений -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Мои объявления
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center mb-3">
+                    <div class="col-md-2">
+                        <div class="fw-bold text-warning">{{ status_stats.pending }}</div>
+                        <small class="text-muted">На проверке</small>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="fw-bold text-success">{{ status_stats.active }}</div>
+                        <small class="text-muted">Одобрено</small>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="fw-bold text-danger">{{ status_stats.rejected }}</div>
+                        <small class="text-muted">Отклонено</small>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="fw-bold text-secondary">{{ status_stats.draft }}</div>
+                        <small class="text-muted">Черновики</small>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="fw-bold text-info">{{ status_stats.sold }}</div>
+                        <small class="text-muted">Продано</small>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="fw-bold text-muted">{{ status_stats.paused }}</div>
+                        <small class="text-muted">Приостановлено</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Табы для разных статусов -->
+        <ul class="nav nav-tabs mb-3" id="listingTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                    Все ({{ all_listings.count }})
+                </button>
+            </li>
+            {% if status_stats.pending > 0 %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                        На проверке ({{ status_stats.pending }})
+                    </button>
+                </li>
+            {% endif %}
+            {% if status_stats.active > 0 %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button" role="tab">
+                        Одобрено ({{ status_stats.active }})
+                    </button>
+                </li>
+            {% endif %}
+            {% if status_stats.rejected > 0 %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab">
+                        Отклонено ({{ status_stats.rejected }})
+                    </button>
+                </li>
+            {% endif %}
+            {% if status_stats.draft > 0 %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="draft-tab" data-bs-toggle="tab" data-bs-target="#draft" type="button" role="tab">
+                        Черновики ({{ status_stats.draft }})
+                    </button>
+                </li>
+            {% endif %}
+            {% if status_stats.sold > 0 %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="sold-tab" data-bs-toggle="tab" data-bs-target="#sold" type="button" role="tab">
+                        Продано ({{ status_stats.sold }})
+                    </button>
+                </li>
+            {% endif %}
+        </ul>
+        
+        <!-- Содержимое табов -->
+        <div class="tab-content" id="listingTabsContent">
+            <!-- Все объявления -->
+            <div class="tab-pane fade show active" id="all" role="tabpanel">
+                {% if all_listings %}
+                    <div class="row">
+                        {% for listing in all_listings %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card listing-card">
+                                    <div class="row g-0">
+                                        <div class="col-4">
+                                            {% if listing.listingimage_set.first %}
+                                                <img src="{{ listing.listingimage_set.first.image.url }}" 
+                                                     class="img-fluid rounded-start" style="height: 120px; object-fit: cover; width: 100%;" 
+                                                     alt="{{ listing.title }}">
+                                            {% else %}
+                                                <div class="bg-light d-flex align-items-center justify-content-center rounded-start" style="height: 120px;">
+                                                    <i class="fas fa-image text-muted fa-2x"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-8">
+                                            <div class="card-body p-2">
+                                                <h6 class="card-title mb-1">
+                                                    <a href="{% url 'listing_detail' listing.id %}" class="text-decoration-none text-dark">
+                                                        {{ listing.title|truncatechars:30 }}
+                                                    </a>
+                                                </h6>
+                                                <p class="card-text mb-1">
+                                                    <small class="text-primary fw-bold">{{ listing.price|floatformat:0 }} {{ listing.currency }}</small>
+                                                </p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="badge bg-{% if listing.status == 'pending' %}warning{% elif listing.status == 'active' %}success{% elif listing.status == 'rejected' %}danger{% elif listing.status == 'sold' %}info{% else %}secondary{% endif %}">
+                                                        {{ listing.get_status_display }}
+                                                    </span>
+                                                    <small class="text-muted">{{ listing.created_at|date:"d.m.Y" }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Нет объявлений</h5>
+                        {% if is_own_profile %}
+                            <a href="{% url 'create_listing' %}" class="btn btn-primary mt-2">
+                                <i class="fas fa-plus me-1"></i>Создать объявление
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- На проверке -->
+            {% if status_stats.pending > 0 %}
+                <div class="tab-pane fade" id="pending" role="tabpanel">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-clock me-2"></i>Ваши объявления находятся на проверке модератором. После проверки вы получите уведомление.
+                    </div>
+                    {% for listing in listings_by_status.pending %}
+                        {% include 'chepochem_app/listing_card.html' with listing=listing %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <!-- Одобрено -->
+            {% if status_stats.active > 0 %}
+                <div class="tab-pane fade" id="active" role="tabpanel">
+                    {% for listing in listings_by_status.active %}
+                        {% include 'chepochem_app/listing_card.html' with listing=listing %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <!-- Отклонено -->
+            {% if status_stats.rejected > 0 %}
+                <div class="tab-pane fade" id="rejected" role="tabpanel">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Эти объявления были отклонены модератором. Проверьте причины отклонения и создайте новое объявление.
+                    </div>
+                    {% for listing in listings_by_status.rejected %}
+                        {% include 'chepochem_app/listing_card.html' with listing=listing %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <!-- Черновики -->
+            {% if status_stats.draft > 0 %}
+                <div class="tab-pane fade" id="draft" role="tabpanel">
+                    {% for listing in listings_by_status.draft %}
+                        {% include 'chepochem_app/listing_card.html' with listing=listing %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <!-- Продано -->
+            {% if status_stats.sold > 0 %}
+                <div class="tab-pane fade" id="sold" role="tabpanel">
+                    {% for listing in listings_by_status.sold %}
+                        {% include 'chepochem_app/listing_card.html' with listing=listing %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Отзывы -->
+{% if reviews %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-star me-2"></i>Отзывы ({{ reviews.count }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for review in reviews|slice:":6" %}
+                            <div class="col-md-6 mb-3">
+                                <div class="border rounded p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <strong>{{ review.reviewer.username }}</strong>
+                                            <div>
+                                                {% for i in "12345"|make_list %}
+                                                    <i class="fas fa-star {% if forloop.counter <= review.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">{{ review.created_at|date:"d.m.Y" }}</small>
+                                    </div>
+                                    <p class="mb-0">{{ review.comment|truncatechars:150 }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+
+
+
+
+

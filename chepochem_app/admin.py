@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
     Role, User, UserProfile, UserReputation, Category, Listing, 
     ListingImage, Review, UserFavorite, Report, ListingModeration, 
-    Notification, UserStatistics
+    Notification, UserStatistics, AuditLog, UserSettings
 )
 
 
@@ -117,3 +117,22 @@ class ListingImageAdmin(admin.ModelAdmin):
     list_display = ['listing', 'is_primary', 'sort_order', 'created_at']
     list_filter = ['is_primary', 'created_at']
     search_fields = ['listing__title']
+
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ['user', 'action', 'entity_type', 'entity_id', 'created_at']
+    list_filter = ['action', 'entity_type', 'created_at']
+    search_fields = ['user__username', 'entity_type', 'details']
+    readonly_fields = ['created_at']
+    date_hierarchy = 'created_at'
+
+
+@admin.register(UserSettings)
+class UserSettingsAdmin(admin.ModelAdmin):
+    list_display = ['user', 'theme', 'date_format', 'page_size', 'updated_at']
+    list_filter = ['theme', 'date_format']
+    search_fields = ['user__username']
+
+
+

@@ -1,0 +1,214 @@
+ERROR 2025-11-01 11:46:43,483 activity_logger chepochem_app.security log_security_event 204 СОБЫТИЕ БЕЗОПАСНОСТИ [ERROR]: exception | Пользователь: admin | IP: 127.0.0.1 | Путь: /listing/2/ | Детали: {'exception_type': 'ValidationError', 'exception_message': '{\'condition\': ["Значения \'excellent\' нет среди допустимых вариантов."]}', 'path': '/listing/2/', 'method': 'GET'}
+ERROR 2025-11-01 11:46:43,518 activity_logger chepochem_app.security log_security_event 204 СОБЫТИЕ БЕЗОПАСНОСТИ [ERROR]: server_error | Пользователь: admin | IP: 127.0.0.1 | Путь: /listing/2/ | Детали: {'status_code': 500, 'path': '/listing/2/', 'method': 'GET'}
+ERROR 2025-11-01 11:46:52,537 activity_logger chepochem_app.security log_security_event 204 СОБЫТИЕ БЕЗОПАСНОСТИ [ERROR]: exception | Пользователь: admin | IP: 127.0.0.1 | Путь: /notifications/ | Детали: {'exception_type': 'TemplateDoesNotExist', 'exception_message': 'chepochem_app/notifications.html', 'path': '/notifications/', 'method': 'GET'}
+ERROR 2025-11-01 11:46:52,576 activity_logger chepochem_app.security log_security_event 204 СОБЫТИЕ БЕЗОПАСНОСТИ [ERROR]: server_error | Пользователь: admin | IP: 127.0.0.1 | Путь: /notifications/ | Детали: {'status_code': 500, 'path': '/notifications/', 'method': 'GET'}
+ERROR 2025-11-01 12:36:51,838 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: TemplateDoesNotExist: chepochem_app/notifications.html | Путь: GET /notifications/ | Пользователь: admin | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 560, in notifications
+    return render(request, 'chepochem_app/notifications.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: chepochem_app/notifications.html
+ERROR 2025-11-01 12:36:51,892 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /notifications/ | Пользователь: admin | IP: 127.0.0.1
+ERROR 2025-11-29 16:44:27,622 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: AttributeError: 'InMemoryUploadedFile' object has no attribute 'url' | Путь: POST /create-listing/ | Пользователь: admin | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\django_rbac_security.py", line 147, in wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 233, in create_listing
+    'image_url': image_form.cleaned_data['image'].url,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'InMemoryUploadedFile' object has no attribute 'url'
+ERROR 2025-11-29 16:44:27,678 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: POST /create-listing/ | Пользователь: admin | IP: 127.0.0.1
+ERROR 2025-11-29 16:58:23,937 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: NameError: name 'UserProfile' is not defined | Путь: GET /edit-profile/ | Пользователь: admin | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 369, in edit_profile
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+                       ^^^^^^^^^^^
+NameError: name 'UserProfile' is not defined. Did you mean: 'user_profile'?
+ERROR 2025-11-29 16:58:24,021 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /edit-profile/ | Пользователь: admin | IP: 127.0.0.1
+ERROR 2025-11-29 16:58:31,963 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: NameError: name 'UserProfile' is not defined | Путь: GET /edit-profile/ | Пользователь: admin | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 369, in edit_profile
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+                       ^^^^^^^^^^^
+NameError: name 'UserProfile' is not defined. Did you mean: 'user_profile'?
+ERROR 2025-11-29 16:58:32,006 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /edit-profile/ | Пользователь: admin | IP: 127.0.0.1
+ERROR 2025-11-29 17:13:45,460 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: TemplateDoesNotExist: chepochem_app/favorites.html | Путь: GET /favorites/ | Пользователь: admin | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 423, in favorites
+    return render(request, 'chepochem_app/favorites.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: chepochem_app/favorites.html
+ERROR 2025-11-29 17:13:45,506 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /favorites/ | Пользователь: admin | IP: 127.0.0.1
+ERROR 2025-11-29 17:35:39,550 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: TemplateDoesNotExist: chepochem_app/favorites.html | Путь: GET /favorites/ | Пользователь: userr | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 423, in favorites
+    return render(request, 'chepochem_app/favorites.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: chepochem_app/favorites.html
+ERROR 2025-11-29 17:35:39,650 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /favorites/ | Пользователь: userr | IP: 127.0.0.1
+ERROR 2025-11-29 17:41:20,509 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: TemplateDoesNotExist: chepochem_app/notifications.html | Путь: GET /notifications/ | Пользователь: userr | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 582, in notifications
+    return render(request, 'chepochem_app/notifications.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: chepochem_app/notifications.html
+ERROR 2025-11-29 17:41:20,537 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /notifications/ | Пользователь: userr | IP: 127.0.0.1
+ERROR 2025-11-29 17:41:24,544 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: TemplateDoesNotExist: chepochem_app/favorites.html | Путь: GET /favorites/ | Пользователь: userr | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 423, in favorites
+    return render(request, 'chepochem_app/favorites.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: chepochem_app/favorites.html
+ERROR 2025-11-29 17:41:24,572 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /favorites/ | Пользователь: userr | IP: 127.0.0.1
+ERROR 2026-01-30 11:21:46,055 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: TemplateDoesNotExist: chepochem_app/favorites.html | Путь: GET /favorites/ | Пользователь: admin | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 423, in favorites
+    return render(request, 'chepochem_app/favorites.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: chepochem_app/favorites.html
+ERROR 2026-01-30 11:21:46,217 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /favorites/ | Пользователь: admin | IP: 127.0.0.1
+ERROR 2026-02-06 11:18:36,425 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: ValidationError: {'condition': ["Значения 'excellent' нет среди допустимых вариантов."]} | Путь: GET /listing/2/ | Пользователь: admin | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 188, in listing_detail
+    listing.save()
+  File "D:\CursachV2\chepochem_app\models.py", line 235, in save
+    self.full_clean()  # Вызываем валидацию перед сохранением
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 1502, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'condition': ["Значения 'excellent' нет среди допустимых вариантов."]}
+ERROR 2026-02-06 11:18:36,482 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /listing/2/ | Пользователь: admin | IP: 127.0.0.1
+ERROR 2026-02-06 11:18:44,112 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: ValidationError: {'condition': ["Значения 'excellent' нет среди допустимых вариантов."]} | Путь: GET /listing/1/ | Пользователь: admin | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 188, in listing_detail
+    listing.save()
+  File "D:\CursachV2\chepochem_app\models.py", line 235, in save
+    self.full_clean()  # Вызываем валидацию перед сохранением
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 1502, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'condition': ["Значения 'excellent' нет среди допустимых вариантов."]}
+ERROR 2026-02-06 11:18:44,144 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /listing/1/ | Пользователь: admin | IP: 127.0.0.1
+ERROR 2026-02-06 11:18:49,639 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: ValidationError: {'condition': ["Значения 'excellent' нет среди допустимых вариантов."]} | Путь: GET /listing/1/ | Пользователь: admin | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 188, in listing_detail
+    listing.save()
+  File "D:\CursachV2\chepochem_app\models.py", line 235, in save
+    self.full_clean()  # Вызываем валидацию перед сохранением
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 1502, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'condition': ["Значения 'excellent' нет среди допустимых вариантов."]}
+ERROR 2026-02-06 11:18:49,671 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /listing/1/ | Пользователь: admin | IP: 127.0.0.1

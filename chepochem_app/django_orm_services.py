@@ -81,7 +81,7 @@ class ListingTransactionService:
                 for image_data in images_data:
                     ListingImage.objects.create(
                         listing=listing,
-                        image=image_data['image_url'],
+                        image=image_data['image'],  # Передаем сам файл, Django сохранит его автоматически
                         alt_text=image_data.get('alt_text', ''),
                         sort_order=image_data.get('sort_order', 0),
                         is_primary=image_data.get('is_primary', False)
@@ -548,3 +548,6 @@ class DataValidator:
             errors.append('Пароль должен содержать минимум 8 символов')
         
         return errors
+
+
+

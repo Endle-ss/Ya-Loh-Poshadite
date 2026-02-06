@@ -68,7 +68,7 @@ class ListingForm(forms.ModelForm):
         model = Listing
         fields = [
             'category', 'title', 'description', 'price', 'currency', 
-            'condition', 'location', 'latitude', 'longitude', 
+            'condition', 'location', 
             'is_negotiable', 'is_urgent'
         ]
         widgets = {
@@ -78,9 +78,7 @@ class ListingForm(forms.ModelForm):
             'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'currency': forms.Select(attrs={'class': 'form-control'}),
             'condition': forms.Select(attrs={'class': 'form-control'}),
-            'location': forms.TextInput(attrs={'class': 'form-control'}),
-            'latitude': forms.NumberInput(attrs={'class': 'form-control', 'step': 'any'}),
-            'longitude': forms.NumberInput(attrs={'class': 'form-control', 'step': 'any'}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Город, район или адрес'}),
             'is_negotiable': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_urgent': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }

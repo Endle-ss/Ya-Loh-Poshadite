@@ -16,6 +16,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <div class="wrapper" style="min-height: 100vh; display: flex; flex-direction: column;">
     <!-- Навигационная панель -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #2c5aa0;">
         <div class="container">
@@ -59,10 +60,10 @@
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user me-1"></i>{{ user.username }}
                             </a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="{% url 'user_profile' user.username %}">
                                     <i class="fas fa-user me-2"></i>Мой профиль
                                 </a></li>
@@ -76,6 +77,11 @@
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{% url 'moderation_dashboard' %}">
                                         <i class="fas fa-shield-alt me-2"></i>Панель модерации
+                                    </a></li>
+                                {% endif %}
+                                {% if user.role.name == 'admin' or user.is_superuser %}
+                                    <li><a class="dropdown-item" href="/admin/">
+                                        <i class="fas fa-cog me-2"></i>Админ-панель Django
                                     </a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
@@ -115,11 +121,12 @@
 
     <!-- Основной контент -->
     <main class="container mt-4">
+        {% csrf_token %}
         {% block content %}{% endblock %}
     </main>
 
     <!-- Футер -->
-    <footer class="bg-dark text-light mt-5 py-4">
+    <footer class="bg-dark text-light py-4 mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
@@ -127,7 +134,7 @@
                     <p class="mb-0">Платформа вторичного рынка товаров с системой репутации пользователей</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <p class="mb-0">&copy; 2024 ЧёПочём. Все права защищены.</p>
+                    <p class="mb-0">Все права защищены.</p>
                 </div>
             </div>
         </div>
@@ -139,5 +146,6 @@
     <script src="{% static 'js/main.js' %}"></script>
     
     {% block extra_js %}{% endblock %}
+    </div>
 </body>
 </html>

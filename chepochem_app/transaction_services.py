@@ -425,3 +425,6 @@ class DataValidator:
             errors.append('Пароль должен содержать минимум 8 символов')
         
         return errors
+
+
+

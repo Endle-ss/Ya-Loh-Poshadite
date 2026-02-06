@@ -11,13 +11,22 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <h1 class="h3 mb-0">{{ listing.title }}</h1>
-                    {% if user == listing.user %}
-                        <div class="btn-group">
+                    <div class="btn-group">
+                        {% if user == listing.user %}
                             <a href="{% url 'edit_listing' listing.id %}" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-edit me-1"></i>Редактировать
                             </a>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                        {% if can_moderate %}
+                            <form method="post" action="{% url 'delete_listing' listing.id %}" 
+                                  onsubmit="return confirm('Вы уверены, что хотите удалить это объявление?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash-alt me-1"></i>Удалить
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
                 </div>
                 
                 <div class="row">
@@ -47,10 +56,15 @@
                             </div>
                             {% if user.is_authenticated and user != listing.user %}
                                 <div class="mt-3">
-                                    <button class="btn btn-outline-danger me-2" id="favorite-btn" data-listing-id="{{ listing.id }}">
-                                        <i class="fas fa-heart me-1"></i>
-                                        {% if is_favorited %}В избранном{% else %}Добавить в избранное{% endif %}
-                                    </button>
+                                    {% if is_favorited %}
+                                        <button class="btn btn-danger me-2" id="favorite-btn" data-listing-id="{{ listing.id }}">
+                                            <i class="fas fa-heart me-1"></i>В избранном
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-outline-danger me-2" id="favorite-btn" data-listing-id="{{ listing.id }}">
+                                            <i class="far fa-heart me-1"></i>Добавить в избранное
+                                        </button>
+                                    {% endif %}
                                     <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#reportModal">
                                         <i class="fas fa-flag me-1"></i>Пожаловаться
                                     </button>
@@ -208,44 +222,4 @@
 {% endfor %}
 {% endblock %}
 
-{% block extra_js %}
-<script>
-// Добавление в избранное
-document.addEventListener('DOMContentLoaded', function() {
-    const favoriteBtn = document.getElementById('favorite-btn');
-    
-    if (favoriteBtn) {
-        favoriteBtn.addEventListener('click', function() {
-            const listingId = this.dataset.listingId;
-            const icon = this.querySelector('i');
-            const text = this.querySelector('span') || this;
-            
-            fetch(`/toggle-favorite/${listingId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                    'Content-Type': 'application/json',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.is_favorited) {
-                    icon.classList.add('fas');
-                    icon.classList.remove('far');
-                    this.classList.add('btn-danger');
-                    this.classList.remove('btn-outline-danger');
-                    text.textContent = 'В избранном';
-                } else {
-                    icon.classList.add('far');
-                    icon.classList.remove('fas');
-                    this.classList.add('btn-outline-danger');
-                    this.classList.remove('btn-danger');
-                    text.textContent = 'Добавить в избранное';
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    }
-});
-</script>
-{% endblock %}
+{% block extra_js %}{% endblock %}

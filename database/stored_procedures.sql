@@ -1,6 +1,3 @@
--- Хранимые процедуры для ЧёПочём
--- Неделя 4: Серверная логика - базовые функции
-
 -- 1. Процедура создания нового объявления
 CREATE OR REPLACE FUNCTION create_listing(
     p_user_id INTEGER,
@@ -19,7 +16,6 @@ CREATE OR REPLACE FUNCTION create_listing(
 DECLARE
     listing_id INTEGER;
 BEGIN
-    -- Валидация входных данных
     IF p_title IS NULL OR LENGTH(TRIM(p_title)) = 0 THEN
         RAISE EXCEPTION 'Заголовок не может быть пустым';
     END IF;
@@ -32,17 +28,14 @@ BEGIN
         RAISE EXCEPTION 'ID пользователя обязателен';
     END IF;
     
-    -- Проверка существования пользователя
     IF NOT EXISTS (SELECT 1 FROM users WHERE id = p_user_id AND is_active = TRUE) THEN
         RAISE EXCEPTION 'Пользователь не найден или неактивен';
     END IF;
     
-    -- Проверка существования категории
     IF NOT EXISTS (SELECT 1 FROM categories WHERE id = p_category_id AND is_active = TRUE) THEN
         RAISE EXCEPTION 'Категория не найдена или неактивна';
     END IF;
     
-    -- Создание объявления
     INSERT INTO listings (
         user_id, category_id, title, description, price, currency,
         condition, location, latitude, longitude, is_negotiable, is_urgent,
@@ -53,13 +46,11 @@ BEGIN
         'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
     ) RETURNING id INTO listing_id;
     
-    -- Обновление статистики пользователя
     UPDATE user_statistics 
     SET listings_count = listings_count + 1,
         updated_at = CURRENT_TIMESTAMP
     WHERE user_id = p_user_id;
     
-    -- Логирование действия
     INSERT INTO user_activity_log (user_id, action, entity_type, entity_id, created_at)
     VALUES (p_user_id, 'create_listing', 'listing', listing_id, CURRENT_TIMESTAMP);
     
@@ -81,7 +72,6 @@ CREATE OR REPLACE FUNCTION update_listing(
 DECLARE
     listing_exists BOOLEAN;
 BEGIN
-    -- Проверка прав доступа
     SELECT EXISTS(
         SELECT 1 FROM listings 
         WHERE id = p_listing_id AND user_id = p_user_id
@@ -91,7 +81,6 @@ BEGIN
         RAISE EXCEPTION 'Объявление не найдено или нет прав на редактирование';
     END IF;
     
-    -- Валидация данных
     IF p_title IS NULL OR LENGTH(TRIM(p_title)) = 0 THEN
         RAISE EXCEPTION 'Заголовок не может быть пустым';
     END IF;
@@ -100,7 +89,6 @@ BEGIN
         RAISE EXCEPTION 'Цена должна быть больше нуля';
     END IF;
     
-    -- Обновление объявления
     UPDATE listings SET
         title = p_title,
         description = p_description,
@@ -108,11 +96,10 @@ BEGIN
         location = p_location,
         is_negotiable = p_is_negotiable,
         is_urgent = p_is_urgent,
-        status = 'pending', -- Снова отправляем на модерацию
+        status = 'pending',
         updated_at = CURRENT_TIMESTAMP
     WHERE id = p_listing_id AND user_id = p_user_id;
     
-    -- Логирование действия
     INSERT INTO user_activity_log (user_id, action, entity_type, entity_id, created_at)
     VALUES (p_user_id, 'update_listing', 'listing', p_listing_id, CURRENT_TIMESTAMP);
     
@@ -129,7 +116,6 @@ DECLARE
     listing_exists BOOLEAN;
     user_role VARCHAR(50);
 BEGIN
-    -- Проверка прав доступа
     SELECT EXISTS(
         SELECT 1 FROM listings l
         JOIN users u ON l.user_id = u.id
@@ -143,20 +129,16 @@ BEGIN
         RAISE EXCEPTION 'Нет прав на удаление объявления';
     END IF;
     
-    -- Получение роли пользователя
     SELECT r.name INTO user_role
     FROM users u
     JOIN roles r ON u.role_id = r.id
     WHERE u.id = p_user_id;
     
-    -- Логирование перед удалением
     INSERT INTO user_activity_log (user_id, action, entity_type, entity_id, created_at)
     VALUES (p_user_id, 'delete_listing', 'listing', p_listing_id, CURRENT_TIMESTAMP);
     
-    -- Удаление объявления (каскадное удаление изображений и избранного)
     DELETE FROM listings WHERE id = p_listing_id;
     
-    -- Обновление статистики пользователя
     UPDATE user_statistics 
     SET listings_count = GREATEST(listings_count - 1, 0),
         updated_at = CURRENT_TIMESTAMP
@@ -179,7 +161,6 @@ DECLARE
     review_id INTEGER;
     existing_review INTEGER;
 BEGIN
-    -- Валидация входных данных
     IF p_rating < 1 OR p_rating > 5 THEN
         RAISE EXCEPTION 'Рейтинг должен быть от 1 до 5';
     END IF;
@@ -188,7 +169,6 @@ BEGIN
         RAISE EXCEPTION 'Нельзя оставить отзыв самому себе';
     END IF;
     
-    -- Проверка существования пользователей
     IF NOT EXISTS (SELECT 1 FROM users WHERE id = p_reviewer_id AND is_active = TRUE) THEN
         RAISE EXCEPTION 'Автор отзыва не найден или неактивен';
     END IF;
@@ -197,7 +177,6 @@ BEGIN
         RAISE EXCEPTION 'Получатель отзыва не найден или неактивен';
     END IF;
     
-    -- Проверка на существующий отзыв
     SELECT id INTO existing_review
     FROM reviews 
     WHERE reviewer_id = p_reviewer_id AND reviewed_user_id = p_reviewed_user_id;
@@ -206,7 +185,6 @@ BEGIN
         RAISE EXCEPTION 'Отзыв уже существует';
     END IF;
     
-    -- Создание отзыва
     INSERT INTO reviews (
         reviewer_id, reviewed_user_id, rating, comment, is_positive,
         created_at, updated_at
@@ -216,10 +194,8 @@ BEGIN
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
     ) RETURNING id INTO review_id;
     
-    -- Обновление репутации пользователя
     PERFORM update_user_reputation(p_reviewed_user_id);
     
-    -- Логирование действия
     INSERT INTO user_activity_log (user_id, action, entity_type, entity_id, created_at)
     VALUES (p_reviewer_id, 'create_review', 'review', review_id, CURRENT_TIMESTAMP);
     
@@ -238,7 +214,6 @@ DECLARE
     moderator_role VARCHAR(50);
     listing_exists BOOLEAN;
 BEGIN
-    -- Проверка прав модератора
     SELECT r.name INTO moderator_role
     FROM users u
     JOIN roles r ON u.role_id = r.id
@@ -248,7 +223,6 @@ BEGIN
         RAISE EXCEPTION 'Недостаточно прав для модерации';
     END IF;
     
-    -- Проверка существования объявления
     SELECT EXISTS(
         SELECT 1 FROM listings WHERE id = p_listing_id AND status = 'pending'
     ) INTO listing_exists;
@@ -257,7 +231,6 @@ BEGIN
         RAISE EXCEPTION 'Объявление не найдено или не требует модерации';
     END IF;
     
-    -- Выполнение действия модерации
     IF p_action = 'approve' THEN
         UPDATE listings SET
             status = 'active',
@@ -265,7 +238,6 @@ BEGIN
             updated_at = CURRENT_TIMESTAMP
         WHERE id = p_listing_id;
         
-        -- Уведомление пользователя
         INSERT INTO notifications (user_id, type, title, content, related_entity_type, related_entity_id, created_at)
         SELECT user_id, 'listing_approved', 'Объявление одобрено', 
                'Ваше объявление "' || title || '" было одобрено и опубликовано.',
@@ -278,7 +250,6 @@ BEGIN
             updated_at = CURRENT_TIMESTAMP
         WHERE id = p_listing_id;
         
-        -- Уведомление пользователя
         INSERT INTO notifications (user_id, type, title, content, related_entity_type, related_entity_id, created_at)
         SELECT user_id, 'listing_rejected', 'Объявление отклонено', 
                'Ваше объявление "' || title || '" было отклонено. Причина: ' || COALESCE(p_reason, 'Не указана'),
@@ -289,14 +260,15 @@ BEGIN
         RAISE EXCEPTION 'Неверное действие модерации';
     END IF;
     
-    -- Запись действия модерации
     INSERT INTO listing_moderation (listing_id, moderator_id, action, reason, created_at)
     VALUES (p_listing_id, p_moderator_id, p_action, p_reason, CURRENT_TIMESTAMP);
     
-    -- Логирование действия
     INSERT INTO user_activity_log (user_id, action, entity_type, entity_id, created_at)
     VALUES (p_moderator_id, 'moderate_listing', 'listing', p_listing_id, CURRENT_TIMESTAMP);
     
     RETURN TRUE;
 END;
 $$ LANGUAGE plpgsql;
+
+
+

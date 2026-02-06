@@ -156,6 +156,17 @@ class Listing(models.Model):
         ('new', 'Новое'),
         ('used', 'Б/у'),
         ('broken', 'Неисправное'),
+        # Для совместимости со старыми/импортированными данными
+        ('excellent', 'Отличное'),
+    ]
+
+    CURRENCY_CHOICES = [
+        ('RUB', '₽ RUB (Российский рубль)'),
+        ('USD', '$ USD (Доллар США)'),
+        ('EUR', '€ EUR (Евро)'),
+        ('KZT', '₸ KZT (Тенге)'),
+        ('BYN', 'Br BYN (Белорусский рубль)'),
+        ('UAH', '₴ UAH (Гривна)'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
@@ -163,7 +174,7 @@ class Listing(models.Model):
     title = models.CharField(max_length=255, verbose_name="Заголовок")
     description = models.TextField(verbose_name="Описание")
     price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Цена")
-    currency = models.CharField(max_length=3, default='RUB', verbose_name="Валюта")
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='RUB', verbose_name="Валюта")
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, default='used', verbose_name="Состояние")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft', verbose_name="Статус")
     location = models.CharField(max_length=255, verbose_name="Местоположение")
@@ -186,7 +197,44 @@ class Listing(models.Model):
     def __str__(self):
         return self.title
 
+    def clean(self):
+        """Валидация данных объявления"""
+        from django.core.exceptions import ValidationError
+        
+        # Валидация заголовка
+        if not self.title or len(self.title.strip()) < 10:
+            raise ValidationError({'title': 'Заголовок должен содержать минимум 10 символов'})
+        if len(self.title) > 255:
+            raise ValidationError({'title': 'Заголовок не должен превышать 255 символов'})
+        
+        # Валидация описания
+        if not self.description or len(self.description.strip()) < 20:
+            raise ValidationError({'description': 'Описание должно содержать минимум 20 символов'})
+        if len(self.description) > 5000:
+            raise ValidationError({'description': 'Описание не должно превышать 5000 символов'})
+        
+        # Валидация цены
+        if self.price <= 0:
+            raise ValidationError({'price': 'Цена должна быть больше нуля'})
+        if self.price > 999999999.99:
+            raise ValidationError({'price': 'Цена не должна превышать 999 999 999.99'})
+        
+        # Валидация координат
+        if self.latitude is not None:
+            if self.latitude < -90 or self.latitude > 90:
+                raise ValidationError({'latitude': 'Широта должна быть в диапазоне от -90 до 90'})
+        
+        if self.longitude is not None:
+            if self.longitude < -180 or self.longitude > 180:
+                raise ValidationError({'longitude': 'Долгота должна быть в диапазоне от -180 до 180'})
+        
+        # Если указана одна координата, должна быть и вторая
+        if (self.latitude is not None and self.longitude is None) or \
+           (self.latitude is None and self.longitude is not None):
+            raise ValidationError('Необходимо указать обе координаты или не указывать их вовсе')
+
     def save(self, *args, **kwargs):
+        self.full_clean()  # Вызываем валидацию перед сохранением
         self.updated_at = timezone.now()
         if self.status == 'active' and not self.published_at:
             self.published_at = timezone.now()
@@ -207,6 +255,33 @@ class ListingImage(models.Model):
         verbose_name = "Изображение объявления"
         verbose_name_plural = "Изображения объявлений"
         ordering = ['sort_order']
+
+    def clean(self):
+        """Валидация изображения"""
+        from django.core.exceptions import ValidationError
+        
+        if self.image:
+            # Проверка размера файла (максимум 10MB)
+            if self.image.size > 10 * 1024 * 1024:
+                raise ValidationError({'image': 'Размер изображения не должен превышать 10 МБ'})
+            
+            # Проверка расширения файла
+            allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+            file_name = self.image.name.lower()
+            if not any(file_name.endswith(ext) for ext in allowed_extensions):
+                raise ValidationError({'image': 'Разрешены только изображения в форматах JPEG, PNG, GIF или WebP'})
+        
+        if self.alt_text and len(self.alt_text) > 255:
+            raise ValidationError({'alt_text': 'Альтернативный текст не должен превышать 255 символов'})
+        
+        if self.sort_order < 0:
+            raise ValidationError({'sort_order': 'Порядок сортировки не может быть отрицательным'})
+        if self.sort_order > 999:
+            raise ValidationError({'sort_order': 'Порядок сортировки не должен превышать 999'})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Изображение для {self.listing.title}"
@@ -231,7 +306,24 @@ class Review(models.Model):
     def __str__(self):
         return f"Отзыв от {self.reviewer.username} для {self.reviewed_user.username}"
 
+    def clean(self):
+        """Валидация отзыва"""
+        from django.core.exceptions import ValidationError
+        
+        if self.rating < 1 or self.rating > 5:
+            raise ValidationError({'rating': 'Оценка должна быть от 1 до 5'})
+        
+        if not self.comment or len(self.comment.strip()) < 10:
+            raise ValidationError({'comment': 'Комментарий должен содержать минимум 10 символов'})
+        if len(self.comment) > 2000:
+            raise ValidationError({'comment': 'Комментарий не должен превышать 2000 символов'})
+        
+        # Проверка, что пользователь не оставляет отзыв самому себе
+        if self.reviewer == self.reviewed_user:
+            raise ValidationError('Нельзя оставить отзыв самому себе')
+
     def save(self, *args, **kwargs):
+        self.full_clean()
         self.updated_at = timezone.now()
         self.is_positive = self.rating >= 4
         super().save(*args, **kwargs)
@@ -378,3 +470,76 @@ class UserStatistics(models.Model):
 
     def __str__(self):
         return f"Статистика {self.user.username}"
+
+
+class AuditLog(models.Model):
+    """Журнал аудита для отслеживания изменений"""
+    ACTION_TYPES = [
+        ('create', 'Создание'),
+        ('update', 'Обновление'),
+        ('delete', 'Удаление'),
+        ('login', 'Вход'),
+        ('logout', 'Выход'),
+        ('moderate', 'Модерация'),
+        ('export', 'Экспорт'),
+        ('import', 'Импорт'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Пользователь")
+    action = models.CharField(max_length=50, choices=ACTION_TYPES, verbose_name="Действие")
+    entity_type = models.CharField(max_length=50, blank=True, verbose_name="Тип сущности")
+    entity_id = models.IntegerField(null=True, blank=True, verbose_name="ID сущности")
+    ip_address = models.GenericIPAddressField(null=True, blank=True, verbose_name="IP адрес")
+    user_agent = models.TextField(blank=True, verbose_name="User Agent")
+    old_data = models.JSONField(null=True, blank=True, verbose_name="Старые данные")
+    new_data = models.JSONField(null=True, blank=True, verbose_name="Новые данные")
+    details = models.TextField(blank=True, verbose_name="Детали")
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Дата создания")
+    
+    class Meta:
+        verbose_name = "Запись аудита"
+        verbose_name_plural = "Журнал аудита"
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'created_at']),
+            models.Index(fields=['entity_type', 'entity_id']),
+            models.Index(fields=['action', 'created_at']),
+        ]
+    
+    def __str__(self):
+        username = self.user.username if self.user else 'anonymous'
+        return f"{self.action} by {username} at {self.created_at}"
+
+
+class UserSettings(models.Model):
+    """Настройки пользователя"""
+    THEME_CHOICES = [
+        ('light', 'Светлая'),
+        ('dark', 'Темная'),
+        ('auto', 'Автоматически'),
+    ]
+    
+    DATE_FORMAT_CHOICES = [
+        ('DD.MM.YYYY', 'ДД.ММ.ГГГГ'),
+        ('MM/DD/YYYY', 'ММ/ДД/ГГГГ'),
+        ('YYYY-MM-DD', 'ГГГГ-ММ-ДД'),
+    ]
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Пользователь")
+    theme = models.CharField(max_length=10, choices=THEME_CHOICES, default='light', verbose_name="Тема")
+    date_format = models.CharField(max_length=20, choices=DATE_FORMAT_CHOICES, default='DD.MM.YYYY', verbose_name="Формат даты")
+    page_size = models.IntegerField(default=20, validators=[MinValueValidator(5), MaxValueValidator(100)], verbose_name="Размер страницы")
+    saved_filters = models.JSONField(default=dict, blank=True, verbose_name="Сохраненные фильтры")
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(default=timezone.now, verbose_name="Дата обновления")
+    
+    class Meta:
+        verbose_name = "Настройки пользователя"
+        verbose_name_plural = "Настройки пользователей"
+    
+    def __str__(self):
+        return f"Настройки {self.user.username}"
+    
+    def save(self, *args, **kwargs):
+        self.updated_at = timezone.now()
+        super().save(*args, **kwargs)

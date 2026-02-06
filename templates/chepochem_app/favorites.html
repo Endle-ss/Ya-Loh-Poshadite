@@ -1,0 +1,146 @@
+{% extends 'chepochem_app/base.html' %}
+{% load static %}
+
+{% block title %}Избранное - ЧёПочём{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">
+                <i class="fas fa-heart text-danger me-2"></i>Избранные объявления
+            </h2>
+            <span class="text-muted">{{ page_obj.paginator.count }} объявлений</span>
+        </div>
+
+        {% if page_obj %}
+            <div class="row">
+                {% for favorite in page_obj %}
+                    {% with listing=favorite.listing %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100 listing-card" style="cursor: pointer;" onclick="window.location.href='{% url 'listing_detail' listing.id %}'">
+                            <!-- Изображение -->
+                            <div class="position-relative">
+                                {% if listing.listingimage_set.first %}
+                                    <img src="{{ listing.listingimage_set.first.image.url }}" 
+                                         class="card-img-top listing-image" 
+                                         alt="{{ listing.title }}"
+                                         onclick="window.location.href='{% url 'listing_detail' listing.id %}'"
+                                         style="cursor: pointer;">
+                                {% else %}
+                                    <div class="card-img-top listing-image bg-light d-flex align-items-center justify-content-center"
+                                         onclick="window.location.href='{% url 'listing_detail' listing.id %}'"
+                                         style="cursor: pointer;">
+                                        <i class="fas fa-image fa-3x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Статус -->
+                                {% if listing.is_urgent %}
+                                    <span class="badge bg-danger position-absolute top-0 start-0 m-2">Срочно</span>
+                                {% endif %}
+                                
+                                <!-- Кнопка удаления из избранного -->
+                                <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 favorite-btn" 
+                                        data-listing-id="{{ listing.id }}"
+                                        title="Удалить из избранного"
+                                        onclick="event.stopPropagation();">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="card-body d-flex flex-column">
+                                <!-- Заголовок и цена -->
+                                <h6 class="card-title">
+                                    <a href="{% url 'listing_detail' listing.id %}" class="text-decoration-none text-dark" onclick="event.stopPropagation();">
+                                        {{ listing.title|truncatechars:50 }}
+                                    </a>
+                                </h6>
+                                
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="h5 text-primary mb-0">
+                                            {{ listing.price|floatformat:0 }} {{ listing.currency }}
+                                        </span>
+                                        <small class="text-muted">
+                                            <i class="fas fa-eye me-1"></i>{{ listing.views_count }}
+                                        </small>
+                                    </div>
+                                    
+                                    <!-- Местоположение и дата -->
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-map-marker-alt me-1"></i>{{ listing.location }}
+                                        </small>
+                                        <br>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>{{ listing.created_at|date:"d.m.Y" }}
+                                        </small>
+                                    </div>
+                                    
+                                    <!-- Статус объявления -->
+                                    <div class="mt-2">
+                                        <span class="badge bg-{% if listing.status == 'pending' %}warning{% elif listing.status == 'active' %}success{% elif listing.status == 'rejected' %}danger{% elif listing.status == 'sold' %}info{% else %}secondary{% endif %}">
+                                            {{ listing.get_status_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+
+            <!-- Пагинация -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Навигация по страницам">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">Первая</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Последняя</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-heart fa-3x text-muted mb-3"></i>
+                <h4 class="text-dark">У вас пока нет избранных объявлений</h4>
+                <p class="text-muted">Добавляйте объявления в избранное, чтобы не потерять их</p>
+                <a href="{% url 'home' %}" class="btn btn-primary mt-3">
+                    <i class="fas fa-search me-2"></i>Найти объявления
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}{% endblock %}
+
