@@ -45,6 +45,20 @@
                         {% if listing.is_urgent %}
                             <span class="badge bg-danger">Срочно</span>
                         {% endif %}
+                        {% if user.is_authenticated and user != listing.user and listing.status == 'active' %}
+                            <div class="mt-3">
+                                <form method="post" action="{% url 'buy_listing' listing.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-credit-card me-1"></i>Купить
+                                    </button>
+                                </form>
+                            </div>
+                        {% elif listing.status == 'sold' %}
+                            <div class="mt-3">
+                                <span class="badge bg-secondary">Товар продан</span>
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="col-md-6">
                         <div class="text-end">

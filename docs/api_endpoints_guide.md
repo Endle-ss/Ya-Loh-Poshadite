@@ -6,7 +6,7 @@
 
 #### **Создание объявления:**
 ```bash
-POST http://localhost:8000/api/server/listings/
+POST http://localhost:8000/api/listings/
 Content-Type: application/json
 
 {
@@ -24,17 +24,17 @@ Content-Type: application/json
 
 #### **Получение списка объявлений:**
 ```bash
-GET http://localhost:8000/api/server/listings/
+GET http://localhost:8000/api/listings/
 ```
 
 #### **Получение конкретного объявления:**
 ```bash
-GET http://localhost:8000/api/server/listings/1/
+GET http://localhost:8000/api/listings/1/
 ```
 
 #### **Обновление объявления:**
 ```bash
-PUT http://localhost:8000/api/server/listings/1/
+PUT http://localhost:8000/api/listings/1/
 Content-Type: application/json
 
 {
@@ -45,7 +45,7 @@ Content-Type: application/json
 
 #### **Удаление объявления:**
 ```bash
-DELETE http://localhost:8000/api/server/listings/1/
+DELETE http://localhost:8000/api/listings/1/
 ```
 
 ### **✅ Представления (Views) созданы:**
@@ -53,8 +53,8 @@ DELETE http://localhost:8000/api/server/listings/1/
 #### **API Views в `server_logic_api.py`:**
 - `ServerLogicListingViewSet` - CRUD для объявлений
 - `ServerLogicReviewViewSet` - CRUD для отзывов
-- `ServerLogicModerationAPIView` - Модерация
-- `ServerLogicSearchAPIView` - Поиск
+- `ServerLogicModerationViewSet` - Модерация объявлений
+- `ServerLogicSearchViewSet` - Поиск объявлений
 
 #### **Обычные Views в `views.py`:**
 - `home` - Главная страница
@@ -62,9 +62,9 @@ DELETE http://localhost:8000/api/server/listings/1/
 - `listing_detail` - Детали объявления
 - `user_profile` - Профиль пользователя
 
-### **✅ Хранимые процедуры (эмулированы через Django ORM):**
+### **✅ Хранимые процедуры (через Django ORM или SQL):**
 
-#### **В `django_orm_services.py`:**
+#### **Через ORM (`django_orm_services.py`):**
 ```python
 class ListingTransactionService:
     @staticmethod
@@ -227,14 +227,8 @@ def moderate_listing(request):
 
 ### **✅ Пароли зашифрованы:**
 
-#### **В `models.py`:**
-```python
-class User(AbstractUser):
-    def save(self, *args, **kwargs):
-        if not self.pk:  # Новый пользователь
-            self.set_password(self.password)  # Автоматическое хеширование
-        super().save(*args, **kwargs)
-```
+В проекте используется стандартное хеширование паролей Django (PBKDF2).  
+Пользователи создаются через `User.objects.create_user(...)`, который автоматически вызывает `set_password` и сохраняет хеш-пароля, а не открытый текст.**
 
 #### **В `django_rbac_security.py`:**
 ```python
@@ -250,48 +244,47 @@ class DjangoPasswordSecurityManager:
 
 ### **✅ Резервное копирование и восстановление:**
 
-#### **В `management/commands/backup_manager.py`:**
-```python
-class BackupManager:
-    def create_full_backup(self, created_by=None):
-        # Создание полной резервной копии
-        
-    def create_incremental_backup(self, created_by=None):
-        # Создание инкрементальной копии
-        
-    def restore_from_backup(self, backup_path, restore_type='full'):
-        # Восстановление из резервной копии
-```
-
-#### **Команды Django:**
+#### **Команды Django (см. `management/commands/backup_manager.py`):**
 ```bash
 # Создание полной резервной копии
-python manage.py backup_manager --action=create_full
+python manage.py backup_manager create-full
 
 # Создание инкрементальной копии
-python manage.py backup_manager --action=create_incremental
+python manage.py backup_manager create-incremental
 
 # Восстановление из резервной копии
-python manage.py backup_manager --action=restore --backup_path=/path/to/backup
+python manage.py backup_manager restore --file=backups/full_backup_YYYYMMDD_HHMMSS.tar.gz
+
+# Очистка старых резервных копий
+python manage.py backup_manager cleanup --retention-days=30
 ```
 
 ### **✅ Логирование действий пользователей:**
 
-#### **В `django_orm_services.py`:**
+#### **В `transaction_services.py` / `django_orm_services.py`:**
 ```python
 class UserActivityLogger:
     @staticmethod
-    def log_activity(user_id, action, entity_type, entity_id, details=None, request=None):
-        # Логирование действий пользователей
-        UserActivityLog.objects.create(
-            user_id=user_id,
-            action=action,
-            entity_type=entity_type,
-            entity_id=entity_id,
-            ip_address=request.META.get('REMOTE_ADDR') if request else None,
-            user_agent=request.META.get('HTTP_USER_AGENT') if request else None,
-            details=details
-        )
+    def log_activity(user_id, action, entity_type=None, entity_id=None, details=None, request=None):
+        # Логирование действий пользователей через сырые SQL-запросы
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO user_activity_log 
+                (user_id, action, entity_type, entity_id, ip_address, user_agent, details, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                [
+                    user_id,
+                    action,
+                    entity_type,
+                    entity_id,
+                    request.META.get('REMOTE_ADDR') if request else None,
+                    request.META.get('HTTP_USER_AGENT') if request else None,
+                    json.dumps(details) if details else None,
+                    timezone.now(),
+                ],
+            )
 ```
 
 #### **В API endpoints:**
@@ -322,17 +315,17 @@ UserActivityLogger.log_activity(
 
 ### **1. Демонстрация API через браузер:**
 ```
-http://localhost:8000/api/server/listings/
-http://localhost:8000/api/server/reviews/
-http://localhost:8000/api/server/moderation/
-http://localhost:8000/api/server/search/
+http://localhost:8000/api/listings/
+http://localhost:8000/api/reviews/
+http://localhost:8000/api/moderation/
+http://localhost:8000/api/search/
 ```
 
 ### **2. Демонстрация через Postman/curl:**
 
 #### **Создание объявления:**
 ```bash
-curl -X POST http://localhost:8000/api/server/listings/ \
+curl -X POST http://localhost:8000/api/listings/ \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -d '{
@@ -346,7 +339,7 @@ curl -X POST http://localhost:8000/api/server/listings/ \
 
 #### **Модерация объявления:**
 ```bash
-curl -X POST http://localhost:8000/api/server/moderation/ \
+curl -X POST http://localhost:8000/api/moderation/ \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -d '{
@@ -368,11 +361,10 @@ curl -X POST http://localhost:8000/api/server/moderation/ \
 - `stored_procedures.sql` - процедуры
 - `functions.sql` - функции
 - `triggers.sql` - триггеры
-- `security_tables.sql` - таблицы безопасности
 
 #### **Резервное копирование:**
 ```bash
-python manage.py backup_manager --action=create_full
+python manage.py backup_manager create-full
 ```
 
 ### **4. Показать логи:**
@@ -388,7 +380,7 @@ python manage.py shell
 ## 📊 **Итоговая проверка требований:**
 
 ### **✅ Неделя 4:**
-- ✅ CRUD-операции: `POST/GET/PUT/DELETE /api/server/listings/`
+- ✅ CRUD-операции: `POST/GET/PUT/DELETE /api/listings/`
 - ✅ Представления: `ServerLogicListingViewSet`, `ServerLogicReviewViewSet`
 - ✅ Хранимые процедуры: `create_listing`, `update_listing`, `delete_listing`
 - ✅ Листинги кода: в `server_logic_api.py`
@@ -405,7 +397,7 @@ python manage.py shell
 - ✅ Пароли зашифрованы: `make_password()`, `check_password()`
 - ✅ Резервное копирование: `BackupManager`
 - ✅ Логирование: `UserActivityLogger.log_activity()`
-- ✅ Документация: `docs/application_documentation.md`
+- ✅ Документация: `docs/api_endpoints_guide.md`
 
 **ВСЁ РЕАЛИЗОВАНО И РАБОТАЕТ!** 🚀
 

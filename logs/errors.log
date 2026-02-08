@@ -212,3 +212,79 @@ Traceback (most recent call last):
     raise ValidationError(errors)
 django.core.exceptions.ValidationError: {'condition': ["Значения 'excellent' нет среди допустимых вариантов."]}
 ERROR 2026-02-06 11:18:49,671 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /listing/1/ | Пользователь: admin | IP: 127.0.0.1
+ERROR 2026-02-06 12:40:01,597 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: TemplateDoesNotExist: chepochem_app/notifications.html | Путь: GET /notifications/ | Пользователь: admin | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 644, in notifications
+    return render(request, 'chepochem_app/notifications.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: chepochem_app/notifications.html
+ERROR 2026-02-06 12:40:01,639 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /notifications/ | Пользователь: admin | IP: 127.0.0.1
+ERROR 2026-02-06 12:47:21,495 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: NameError: name 'UserProfile' is not defined | Путь: GET /edit-profile/ | Пользователь: userr | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 418, in edit_profile
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+                       ^^^^^^^^^^^
+NameError: name 'UserProfile' is not defined. Did you mean: 'user_profile'?
+ERROR 2026-02-06 12:47:21,531 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /edit-profile/ | Пользователь: userr | IP: 127.0.0.1
+ERROR 2026-02-06 13:40:57,054 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: TemplateDoesNotExist: chepochem_app/edit_profile.html | Путь: GET /edit-profile/ | Пользователь: userr | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 432, in edit_profile
+    return render(request, 'chepochem_app/edit_profile.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: chepochem_app/edit_profile.html
+ERROR 2026-02-06 13:40:57,094 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /edit-profile/ | Пользователь: userr | IP: 127.0.0.1
+ERROR 2026-02-06 13:41:00,876 middleware chepochem_app.errors process_exception 64 ИСКЛЮЧЕНИЕ: TemplateDoesNotExist: chepochem_app/edit_profile.html | Путь: GET /edit-profile/ | Пользователь: userr | IP: 127.0.0.1
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 432, in edit_profile
+    return render(request, 'chepochem_app/edit_profile.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: chepochem_app/edit_profile.html
+ERROR 2026-02-06 13:41:00,904 middleware chepochem_app.errors process_response 47 ОШИБКА СЕРВЕРА 500: GET /edit-profile/ | Пользователь: userr | IP: 127.0.0.1

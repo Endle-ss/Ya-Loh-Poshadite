@@ -953,3 +953,230 @@ INFO 2026-02-06 11:26:43,980 basehttp django.server log_message 212 "GET /static
 WARNING 2026-02-06 11:26:44,690 log django.request log_response 241 Not Found: /favicon.ico
 WARNING 2026-02-06 11:26:44,691 basehttp django.server log_message 212 "GET /favicon.ico HTTP/1.1" 404 5677
 INFO 2026-02-06 11:26:46,522 basehttp django.server log_message 212 "GET /listing/1/ HTTP/1.1" 200 14588
+INFO 2026-02-06 11:39:37,062 basehttp django.server log_message 212 "GET /moderation/ HTTP/1.1" 200 12324
+WARNING 2026-02-06 11:39:37,428 log django.request log_response 241 Not Found: /favicon.ico
+WARNING 2026-02-06 11:39:37,429 basehttp django.server log_message 212 "GET /favicon.ico HTTP/1.1" 404 5677
+INFO 2026-02-06 11:39:38,000 basehttp django.server log_message 212 "GET /moderation/ HTTP/1.1" 200 12324
+INFO 2026-02-06 11:39:38,051 basehttp django.server log_message 212 "GET /static/css/style.css HTTP/1.1" 200 10356
+INFO 2026-02-06 11:39:38,054 basehttp django.server log_message 212 "GET /static/js/main.js HTTP/1.1" 200 30811
+WARNING 2026-02-06 11:39:40,502 log django.request log_response 241 Not Found: /favicon.ico
+WARNING 2026-02-06 11:39:40,504 basehttp django.server log_message 212 "GET /favicon.ico HTTP/1.1" 404 5677
+INFO 2026-02-06 11:39:40,851 basehttp django.server log_message 212 "GET /moderation/ HTTP/1.1" 200 12324
+INFO 2026-02-06 11:39:40,897 basehttp django.server log_message 212 "GET /static/css/style.css HTTP/1.1" 200 10356
+INFO 2026-02-06 11:39:40,899 basehttp django.server log_message 212 "GET /static/js/main.js HTTP/1.1" 200 30811
+INFO 2026-02-06 11:39:46,227 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 31961
+INFO 2026-02-06 11:39:53,214 autoreload django.utils.autoreload run_with_reloader 668 Watching for file changes with StatReloader
+INFO 2026-02-06 11:39:59,455 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 31961
+INFO 2026-02-06 11:39:59,665 basehttp django.server log_message 212 "GET /static/css/style.css HTTP/1.1" 200 10356
+INFO 2026-02-06 11:39:59,667 basehttp django.server log_message 212 "GET /media/listings/1736168870_new_preview_hqdefault.jpg HTTP/1.1" 200 7747
+INFO 2026-02-06 11:39:59,673 basehttp django.server log_message 212 "GET /media/listings/7620806_pixel-tree-tree-trunk-pixel-hd-png-download_1.png HTTP/1.1" 200 472461
+INFO 2026-02-06 11:39:59,682 basehttp django.server log_message 212 "GET /media/listings/cat.jpg HTTP/1.1" 200 489905
+INFO 2026-02-06 11:39:59,752 basehttp django.server log_message 212 "GET /static/js/main.js HTTP/1.1" 200 30811
+WARNING 2026-02-06 11:40:00,783 log django.request log_response 241 Not Found: /favicon.ico
+WARNING 2026-02-06 11:40:00,783 basehttp django.server log_message 212 "GET /favicon.ico HTTP/1.1" 404 5677
+INFO 2026-02-06 11:40:10,493 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 31961
+INFO 2026-02-06 11:40:26,670 basehttp django.server log_message 212 "GET /create-listing/ HTTP/1.1" 200 22581
+INFO 2026-02-06 11:40:29,071 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 31961
+INFO 2026-02-06 11:40:42,220 basehttp django.server log_message 212 "GET /listing/6/ HTTP/1.1" 200 15209
+INFO 2026-02-06 11:40:43,571 basehttp django.server log_message 212 "GET /favorites/ HTTP/1.1" 200 10370
+INFO 2026-02-06 11:40:54,304 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 31961
+INFO 2026-02-06 11:40:55,273 basehttp django.server log_message 212 "GET /profile/admin/ HTTP/1.1" 200 11668
+INFO 2026-02-06 11:41:07,095 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 31961
+INFO 2026-02-06 11:41:23,904 basehttp django.server log_message 212 "GET /moderation/ HTTP/1.1" 200 12324
+INFO 2026-02-06 11:41:27,565 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 31961
+INFO 2026-02-06 11:41:28,934 basehttp django.server log_message 212 "GET /listing/7/ HTTP/1.1" 200 15066
+INFO 2026-02-06 11:41:32,661 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 31961
+INFO 2026-02-06 11:48:13,560 autoreload django.utils.autoreload run_with_reloader 668 Watching for file changes with StatReloader
+INFO 2026-02-06 11:48:19,293 basehttp django.server log_message 212 "GET /?search=%D0%93%D0%BE%D1%82 HTTP/1.1" 200 14914
+INFO 2026-02-06 11:48:19,581 basehttp django.server log_message 212 "GET /media/listings/1736168870_new_preview_hqdefault.jpg HTTP/1.1" 200 7747
+INFO 2026-02-06 11:48:19,581 basehttp django.server log_message 212 "GET /static/css/style.css HTTP/1.1" 200 10356
+INFO 2026-02-06 11:48:19,613 basehttp django.server log_message 212 "GET /static/js/main.js HTTP/1.1" 200 30811
+WARNING 2026-02-06 11:48:20,256 log django.request log_response 241 Not Found: /favicon.ico
+WARNING 2026-02-06 11:48:20,256 basehttp django.server log_message 212 "GET /favicon.ico HTTP/1.1" 404 5677
+WARNING 2026-02-06 11:48:35,742 log django.request log_response 241 Not Found: /api/analytics/
+WARNING 2026-02-06 11:48:35,745 basehttp django.server log_message 212 "GET /api/analytics/ HTTP/1.1" 404 24889
+INFO 2026-02-06 12:36:15,017 autoreload django.utils.autoreload run_with_reloader 668 Watching for file changes with StatReloader
+INFO 2026-02-06 12:36:25,060 basehttp django.server log_message 212 "GET /?search= HTTP/1.1" 200 31961
+INFO 2026-02-06 12:36:25,194 basehttp django.server log_message 212 "GET /static/js/main.js HTTP/1.1" 304 0
+INFO 2026-02-06 12:36:30,347 basehttp django.server log_message 212 "GET /logout/ HTTP/1.1" 302 0
+INFO 2026-02-06 12:36:30,371 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 27117
+INFO 2026-02-06 12:36:32,254 basehttp django.server log_message 212 "GET /register/ HTTP/1.1" 200 8137
+INFO 2026-02-06 12:37:21,350 basehttp django.server log_message 212 "POST /register/ HTTP/1.1" 302 0
+INFO 2026-02-06 12:37:21,379 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 31716
+INFO 2026-02-06 12:37:24,712 basehttp django.server log_message 212 "GET /create-listing/ HTTP/1.1" 200 21965
+INFO 2026-02-06 12:39:37,643 basehttp django.server log_message 212 "POST /create-listing/ HTTP/1.1" 200 22819
+ERROR 2026-02-06 12:39:47,315 django_orm_services chepochem_app.django_orm_services execute_raw_sql 38 Ошибка выполнения SQL: not all arguments converted during string formatting
+ERROR 2026-02-06 12:39:47,316 django_orm_services chepochem_app.django_orm_services log_activity 487 Ошибка логирования активности: not all arguments converted during string formatting
+INFO 2026-02-06 12:39:47,322 basehttp django.server log_message 212 "POST /create-listing/ HTTP/1.1" 302 0
+INFO 2026-02-06 12:39:47,421 basehttp django.server log_message 212 "GET /listing/8/ HTTP/1.1" 200 12020
+INFO 2026-02-06 12:39:53,191 basehttp django.server log_message 212 "GET /logout/ HTTP/1.1" 302 0
+INFO 2026-02-06 12:39:53,211 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 27115
+INFO 2026-02-06 12:39:54,699 basehttp django.server log_message 212 "GET /login/ HTTP/1.1" 200 6480
+INFO 2026-02-06 12:39:57,375 basehttp django.server log_message 212 "POST /login/ HTTP/1.1" 302 0
+INFO 2026-02-06 12:39:57,399 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 32312
+ERROR 2026-02-06 12:40:01,636 log django.request log_response 241 Internal Server Error: /notifications/
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 644, in notifications
+    return render(request, 'chepochem_app/notifications.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: chepochem_app/notifications.html
+ERROR 2026-02-06 12:40:01,641 basehttp django.server log_message 212 "GET /notifications/ HTTP/1.1" 500 94748
+INFO 2026-02-06 12:40:08,702 basehttp django.server log_message 212 "GET /moderation/ HTTP/1.1" 200 15303
+INFO 2026-02-06 12:40:13,878 basehttp django.server log_message 212 "GET /moderate-listing/8/ HTTP/1.1" 200 15597
+INFO 2026-02-06 12:40:16,841 basehttp django.server log_message 212 "GET /profile/POL/ HTTP/1.1" 200 15185
+INFO 2026-02-06 12:40:32,848 basehttp django.server log_message 212 "GET /moderation/?status=active HTTP/1.1" 200 26373
+INFO 2026-02-06 12:40:33,817 basehttp django.server log_message 212 "GET /moderation/?status=rejected HTTP/1.1" 200 15051
+INFO 2026-02-06 12:40:35,511 basehttp django.server log_message 212 "GET /listing/4/ HTTP/1.1" 200 13990
+INFO 2026-02-06 12:40:41,418 basehttp django.server log_message 212 "GET /listing/4/ HTTP/1.1" 200 13990
+INFO 2026-02-06 12:40:47,495 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 31961
+INFO 2026-02-06 12:40:54,650 basehttp django.server log_message 212 "GET /admin/ HTTP/1.1" 200 12153
+INFO 2026-02-06 12:40:58,050 basehttp django.server log_message 212 "GET /admin/chepochem_app/listing/ HTTP/1.1" 200 26427
+INFO 2026-02-06 12:40:58,129 basehttp django.server log_message 212 "GET /admin/jsi18n/ HTTP/1.1" 200 16066
+INFO 2026-02-06 12:40:58,287 basehttp django.server log_message 212 "GET /static/admin/css/changelists.css HTTP/1.1" 200 6566
+INFO 2026-02-06 12:40:58,288 basehttp django.server log_message 212 "GET /static/admin/css/forms.css HTTP/1.1" 200 9047
+INFO 2026-02-06 12:40:58,312 basehttp django.server log_message 212 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2026-02-06 12:40:58,313 basehttp django.server log_message 212 "GET /static/admin/js/core.js HTTP/1.1" 200 5682
+INFO 2026-02-06 12:40:58,315 basehttp django.server log_message 212 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2026-02-06 12:40:58,318 basehttp django.server log_message 212 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 8943
+INFO 2026-02-06 12:40:58,320 basehttp django.server log_message 212 "GET /static/admin/js/actions.js HTTP/1.1" 200 7872
+INFO 2026-02-06 12:40:58,335 basehttp django.server log_message 212 "GET /static/admin/css/widgets.css HTTP/1.1" 200 11900
+INFO 2026-02-06 12:40:58,340 basehttp django.server log_message 212 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2026-02-06 12:40:58,348 basehttp django.server log_message 212 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 292458
+INFO 2026-02-06 12:40:58,359 basehttp django.server log_message 212 "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+INFO 2026-02-06 12:40:58,363 basehttp django.server log_message 212 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 232381
+INFO 2026-02-06 12:40:58,424 basehttp django.server log_message 212 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2026-02-06 12:40:58,467 basehttp django.server log_message 212 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+INFO 2026-02-06 12:40:58,467 basehttp django.server log_message 212 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2026-02-06 12:41:05,412 basehttp django.server log_message 212 "GET /admin/chepochem_app/user/ HTTP/1.1" 200 20194
+INFO 2026-02-06 12:41:05,466 basehttp django.server log_message 212 "GET /admin/jsi18n/ HTTP/1.1" 200 16066
+INFO 2026-02-06 12:41:05,466 basehttp django.server log_message 212 "GET /static/admin/img/icon-yes.svg HTTP/1.1" 200 436
+INFO 2026-02-06 12:41:05,467 basehttp django.server log_message 212 "GET /static/admin/img/icon-no.svg HTTP/1.1" 200 560
+INFO 2026-02-06 12:41:25,968 basehttp django.server log_message 212 "GET /admin/chepochem_app/notification/ HTTP/1.1" 200 19787
+INFO 2026-02-06 12:41:26,028 basehttp django.server log_message 212 "GET /admin/jsi18n/ HTTP/1.1" 200 16066
+INFO 2026-02-06 12:41:40,423 autoreload django.utils.autoreload trigger_reload 266 D:\CursachV2\chepochem_app\django_orm_services.py changed, reloading.
+INFO 2026-02-06 12:41:41,123 autoreload django.utils.autoreload run_with_reloader 668 Watching for file changes with StatReloader
+INFO 2026-02-06 12:42:11,744 basehttp django.server log_message 212 "GET /admin/chepochem_app/user/ HTTP/1.1" 200 20194
+INFO 2026-02-06 12:42:12,271 basehttp django.server log_message 212 "GET /admin/chepochem_app/listing/ HTTP/1.1" 200 26427
+INFO 2026-02-06 12:42:12,859 basehttp django.server log_message 212 "GET /admin/ HTTP/1.1" 200 12153
+INFO 2026-02-06 12:42:15,334 basehttp django.server log_message 212 "GET /listing/7/ HTTP/1.1" 200 15066
+INFO 2026-02-06 12:45:16,337 autoreload django.utils.autoreload trigger_reload 266 D:\CursachV2\chepochem_app\models.py changed, reloading.
+INFO 2026-02-06 12:45:17,374 autoreload django.utils.autoreload run_with_reloader 668 Watching for file changes with StatReloader
+INFO 2026-02-06 12:45:28,865 autoreload django.utils.autoreload trigger_reload 266 D:\CursachV2\chepochem_app\views.py changed, reloading.
+INFO 2026-02-06 12:45:29,767 autoreload django.utils.autoreload run_with_reloader 668 Watching for file changes with StatReloader
+INFO 2026-02-06 12:45:32,088 autoreload django.utils.autoreload trigger_reload 266 D:\CursachV2\chepochem_app\urls.py changed, reloading.
+INFO 2026-02-06 12:45:32,897 autoreload django.utils.autoreload run_with_reloader 668 Watching for file changes with StatReloader
+INFO 2026-02-06 12:46:16,207 autoreload django.utils.autoreload trigger_reload 266 D:\CursachV2\chepochem_app\models.py changed, reloading.
+INFO 2026-02-06 12:46:17,250 autoreload django.utils.autoreload run_with_reloader 668 Watching for file changes with StatReloader
+INFO 2026-02-06 12:46:23,029 basehttp django.server log_message 212 "GET /listing/7/ HTTP/1.1" 200 15695
+INFO 2026-02-06 12:46:23,319 basehttp django.server log_message 212 "GET /static/css/style.css HTTP/1.1" 200 10356
+INFO 2026-02-06 12:46:23,319 basehttp django.server log_message 212 "GET /media/listings/1736168870_new_preview_hqdefault.jpg HTTP/1.1" 200 7747
+INFO 2026-02-06 12:46:23,352 basehttp django.server log_message 212 "GET /static/js/main.js HTTP/1.1" 200 30811
+WARNING 2026-02-06 12:46:23,814 log django.request log_response 241 Not Found: /favicon.ico
+WARNING 2026-02-06 12:46:23,814 basehttp django.server log_message 212 "GET /favicon.ico HTTP/1.1" 404 5879
+INFO 2026-02-06 12:46:26,522 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 31961
+INFO 2026-02-06 12:46:27,700 basehttp django.server log_message 212 "GET /listing/7/ HTTP/1.1" 200 15696
+INFO 2026-02-06 12:46:28,948 basehttp django.server log_message 212 "POST /buy-listing/7/ HTTP/1.1" 302 0
+INFO 2026-02-06 12:46:28,982 basehttp django.server log_message 212 "GET /listing/7/ HTTP/1.1" 200 15721
+INFO 2026-02-06 12:46:38,137 basehttp django.server log_message 212 "GET /admin/ HTTP/1.1" 200 12153
+INFO 2026-02-06 12:46:43,016 basehttp django.server log_message 212 "GET /moderation/ HTTP/1.1" 200 15303
+INFO 2026-02-06 12:46:45,138 basehttp django.server log_message 212 "GET /moderation/?status=active HTTP/1.1" 200 24153
+INFO 2026-02-06 12:46:47,389 basehttp django.server log_message 212 "GET /moderation/?status=all HTTP/1.1" 200 31404
+INFO 2026-02-06 12:46:56,688 basehttp django.server log_message 212 "GET /logout/ HTTP/1.1" 302 0
+INFO 2026-02-06 12:46:56,708 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 24277
+INFO 2026-02-06 12:46:59,278 basehttp django.server log_message 212 "GET /login/ HTTP/1.1" 200 6480
+INFO 2026-02-06 12:47:03,754 basehttp django.server log_message 212 "POST /login/ HTTP/1.1" 302 0
+INFO 2026-02-06 12:47:04,153 basehttp django.server log_message 212 "POST /login/ HTTP/1.1" 302 0
+INFO 2026-02-06 12:47:04,183 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 28352
+INFO 2026-02-06 12:47:08,126 basehttp django.server log_message 212 "GET /notifications/ HTTP/1.1" 200 11539
+INFO 2026-02-06 12:47:15,849 basehttp django.server log_message 212 "GET /listing/7/ HTTP/1.1" 200 13025
+ERROR 2026-02-06 12:47:21,527 log django.request log_response 241 Internal Server Error: /edit-profile/
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 418, in edit_profile
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+                       ^^^^^^^^^^^
+NameError: name 'UserProfile' is not defined. Did you mean: 'user_profile'?
+ERROR 2026-02-06 12:47:21,532 basehttp django.server log_message 212 "GET /edit-profile/ HTTP/1.1" 500 78965
+INFO 2026-02-06 12:50:39,668 autoreload django.utils.autoreload trigger_reload 266 D:\CursachV2\chepochem_app\views.py changed, reloading.
+INFO 2026-02-06 12:50:41,354 autoreload django.utils.autoreload run_with_reloader 668 Watching for file changes with StatReloader
+INFO 2026-02-06 12:50:44,742 autoreload django.utils.autoreload trigger_reload 266 D:\CursachV2\chepochem_app\views.py changed, reloading.
+INFO 2026-02-06 12:50:45,743 autoreload django.utils.autoreload run_with_reloader 668 Watching for file changes with StatReloader
+INFO 2026-02-06 13:40:32,244 autoreload django.utils.autoreload run_with_reloader 668 Watching for file changes with StatReloader
+INFO 2026-02-06 13:40:42,619 basehttp django.server log_message 212 "GET / HTTP/1.1" 200 28001
+INFO 2026-02-06 13:40:42,713 basehttp django.server log_message 212 "GET /static/js/main.js HTTP/1.1" 304 0
+INFO 2026-02-06 13:40:55,108 basehttp django.server log_message 212 "GET /profile/userr/ HTTP/1.1" 200 22009
+ERROR 2026-02-06 13:40:57,091 log django.request log_response 241 Internal Server Error: /edit-profile/
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 432, in edit_profile
+    return render(request, 'chepochem_app/edit_profile.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: chepochem_app/edit_profile.html
+ERROR 2026-02-06 13:40:57,095 basehttp django.server log_message 212 "GET /edit-profile/ HTTP/1.1" 500 95806
+ERROR 2026-02-06 13:41:00,901 log django.request log_response 241 Internal Server Error: /edit-profile/
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CursachV2\chepochem_app\views.py", line 432, in edit_profile
+    return render(request, 'chepochem_app/edit_profile.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\shortcuts.py", line 24, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: chepochem_app/edit_profile.html
+ERROR 2026-02-06 13:41:00,905 basehttp django.server log_message 212 "GET /edit-profile/ HTTP/1.1" 500 95807
+WARNING 2026-02-06 14:12:36,267 log django.request log_response 241 Not Found: /favicon.ico
+WARNING 2026-02-06 14:12:36,270 basehttp django.server log_message 212 "GET /favicon.ico HTTP/1.1" 404 5879

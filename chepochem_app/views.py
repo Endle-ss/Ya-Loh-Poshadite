@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import AuthenticationForm
 from .models import (
     User, Role, Category, Listing, ListingImage, Review, UserFavorite, 
-    Report, ListingModeration, Notification, UserReputation
+    Report, ListingModeration, Notification, UserReputation, UserProfile
 )
 from .forms import (
     UserRegistrationForm, ListingForm, ReviewForm, ReportForm,
@@ -642,3 +642,80 @@ def notifications(request):
         'page_obj': page_obj,
     }
     return render(request, 'chepochem_app/notifications.html', context)
+
+
+@login_required
+def buy_listing(request, listing_id):
+    """Простейшая покупка объявления.
+
+    - Только авторизованный пользователь.
+    - Нельзя купить своё объявление.
+    - Можно купить только активное объявление.
+    - При покупке объявление помечается как проданное,
+      обновляется простая статистика и создаются уведомления
+      для продавца и покупателя.
+    """
+    listing = get_object_or_404(Listing, id=listing_id)
+
+    if request.method != 'POST':
+        # Покупка допускается только POST-запросом
+        return redirect('listing_detail', listing_id=listing.id)
+
+    # Нельзя покупать своё объявление
+    if listing.user_id == request.user.id:
+        messages.error(request, 'Нельзя купить своё собственное объявление.')
+        return redirect('listing_detail', listing_id=listing.id)
+
+    # Можно купить только активное объявление
+    if listing.status != 'active':
+        messages.error(request, 'Это объявление недоступно для покупки.')
+        return redirect('listing_detail', listing_id=listing.id)
+
+    seller = listing.user
+    buyer = request.user
+
+    try:
+        # Помечаем объявление как проданное
+        listing.status = 'sold'
+        listing.save()
+
+        # Простое обновление статистики продавца и покупателя (если есть такие записи)
+        from .models import UserStatistics
+
+        seller_stats, _ = UserStatistics.objects.get_or_create(user=seller)
+        buyer_stats, _ = UserStatistics.objects.get_or_create(user=buyer)
+
+        seller_stats.sold_count += 1
+        seller_stats.total_earnings += listing.price
+        seller_stats.save()
+
+        buyer_stats.purchased_count += 1
+        buyer_stats.total_spent += listing.price
+        buyer_stats.save()
+
+        # Уведомление продавцу о продаже
+        Notification.objects.create(
+            user=seller,
+            type='listing_sold',
+            title='Ваше объявление продано',
+            content=f'Пользователь {buyer.username} купил "{listing.title}" за {listing.price} {listing.currency}.',
+            related_entity_type='listing',
+            related_entity_id=listing.id,
+        )
+
+        # Уведомление покупателю о покупке
+        Notification.objects.create(
+            user=buyer,
+            type='purchase_created',
+            title='Покупка успешно оформлена',
+            content=f'Вы купили "{listing.title}" у пользователя {seller.username} за {listing.price} {listing.currency}.',
+            related_entity_type='listing',
+            related_entity_id=listing.id,
+        )
+
+        messages.success(request, 'Покупка успешно оформлена! Объявление помечено как проданное.')
+
+    except Exception as e:
+        messages.error(request, f'Не удалось оформить покупку: {e}')
+
+    return redirect('listing_detail', listing_id=listing.id)

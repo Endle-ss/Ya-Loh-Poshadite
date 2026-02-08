@@ -428,6 +428,8 @@ class Notification(models.Model):
         ('listing_approved', 'Объявление одобрено'),
         ('listing_rejected', 'Объявление отклонено'),
         ('new_review', 'Новый отзыв'),
+        ('listing_sold', 'Объявление продано'),
+        ('purchase_created', 'Покупка совершена'),
         ('new_message', 'Новое сообщение'),
         ('listing_expired', 'Объявление истекло'),
         ('report_resolved', 'Жалоба рассмотрена'),
