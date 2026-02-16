@@ -318,11 +318,15 @@ python manage.py backup_manager cleanup --retention-days=30
 ## ⌨️ Горячие клавиши
 
 - `Ctrl/Cmd + K` - Поиск
-- `Ctrl/Cmd + N` - Новое объявление
+- `Ctrl/Cmd + Shift + N` - Новое объявление
 - `Ctrl/Cmd + F` - Избранное
 - `Ctrl/Cmd + P` - Профиль
 - `Ctrl/Cmd + H` - Главная
+- `Ctrl/Cmd + C` - Категории
+- `Ctrl/Cmd + Shift + C` - Мои объявления
+- `Ctrl/Cmd + Shift + R` - Отзывы
 - `Ctrl/Cmd + S` - Сохранить (в формах)
+- `Ctrl/Cmd + /` - Показать справку по горячим клавишам
 - `/` - Фокус на поиск
 - `Esc` - Закрыть модальное окно
 
